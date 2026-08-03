@@ -121,6 +121,8 @@ def collect_worknet(key):
     items = []
     print("─" * 40)
     print("[A] 워크넷 공공 API 수집 시작")
+    print("   (키 길이: %d자)" % len(key))
+    first_debug = True
     for i, (name, kw, matches, negs, cat) in enumerate(COMPANIES, 1):
         try:
             params = urllib.parse.urlencode({
@@ -130,6 +132,9 @@ def collect_worknet(key):
             req = urllib.request.Request(WORKNET_URL + "?" + params)
             with urllib.request.urlopen(req, timeout=15) as res:
                 xml = res.read().decode("utf-8", "replace")
+            if first_debug:
+                print("   [디버그] 첫 응답 앞부분: " + xml[:300].replace(chr(10)," "))
+                first_debug = False
             root = ET.fromstring(xml)
             n = 0
             for w in root.iter("wanted"):
@@ -156,7 +161,8 @@ def collect_worknet(key):
             if n:
                 print(f"  [{i:2d}] {name}: {n}건")
         except Exception as e:
-            print(f"  [{i:2d}] {name}: 실패 ({e})")
+            if i <= 5 or "0" not in str(e):
+                print(f"  [{i:2d}] {name}: 실패 ({type(e).__name__}: {e})")
         time.sleep(0.25)
     print(f"[A] 워크넷 합계 {len(items)}건")
     return items
