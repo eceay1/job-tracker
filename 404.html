@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>로그인 처리 중...</title>
+<script>
+/* GitHub Pages 로그인 리다이렉트 픽스
+   매직링크가 도메인 루트나 잘못된 경로로 토큰(#access_token / ?code)을 보내며
+   404를 내면, 이 페이지가 토큰을 그대로 들고 실제 앱 주소로 돌려보냅니다. */
+(function () {
+  var APP = "/job-tracker/";              // 실제 사이트 경로
+  var path = window.location.pathname;
+  var hash = window.location.hash || "";  // #access_token=... (매직링크)
+  var search = window.location.search || ""; // ?code=... (PKCE)
+
+  var hasToken = hash.indexOf("access_token") > -1
+              || hash.indexOf("error") > -1
+              || search.indexOf("code=") > -1;
+
+  // 이미 앱 폴더 안이면 무한루프 방지: 앱 index로만 보정
+  if (hasToken) {
+    // 어떤 경로로 떨어졌든 토큰(해시/쿼리)을 유지한 채 앱 index로 이동
+    window.location.replace(APP + search + hash);
+  } else {
+    // 토큰 없는 일반 404 → 그냥 앱 홈으로
+    window.location.replace(APP);
+  }
+})();
+</script>
+</head>
+<body style="font-family:sans-serif; text-align:center; margin-top:80px; color:#5B6B8C;">
+로그인 처리 중입니다... 잠시만 기다려주세요.<br>
+자동으로 넘어가지 않으면 <a href="/job-tracker/">여기</a>를 눌러주세요.
+</body>
+</html>
