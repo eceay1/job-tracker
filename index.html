@@ -463,6 +463,7 @@ const COMPANIES = [
 ["유진테크놀로지","Eugene Technology",5,""],
 ["델코","Delkor",5,""]
 ];
+const RECRUIT = {"삼성전자 DS": "https://www.samsungcareers.com/hr/", "SK하이닉스": "https://www.skcareers.com/", "마이크론코리아": "https://careers.micron.com/careers", "매그나칩반도체": "https://www.magnachip.com/careers/", "온세미": "https://careers.onsemi.com/", "어플라이드머티어리얼즈": "https://careers.appliedmaterials.com/careers", "ASML코리아": "https://www.asml.com/en/careers/find-a-job", "도쿄일렉트론코리아": "https://www.tel.com/careers/", "램리서치코리아": "https://lamresearch-careers.com/", "원익IPS": "https://recruit.wonik.com/", "주성엔지니어링": "https://jusung.career.greetinghr.com/", "PSK": "https://www.psk-inc.com/recruit/", "선익시스템": "https://www.sunic.co.kr/", "참엔지니어링": "https://www.charmeng.com/", "캐논코리아": "https://www.canon-korea.co.kr/", "네패스": "https://www.nepes.co.kr/recruit", "앰코테크놀로지코리아": "https://www.amkor.com/careers/", "한미반도체": "https://www.hanmisemi.com/", "LB세미콘": "https://www.lbsemicon.com/", "스태츠칩팩코리아": "https://www.statschippac.com/careers", "ASE코리아": "https://www.aseglobal.com/en/careers/", "삼성전기": "https://www.samsungcareers.com/hr/", "SK실트론": "https://www.skcareers.com/", "동진쎄미켐": "https://www.dongjin.com/", "솔브레인": "https://www.soulbrain.co.kr/recruit/", "티씨케이": "https://www.tckcorp.com/", "동우화인켐": "https://www.dwchem.co.kr/", "도레이첨단소재": "https://www.torayamk.com/", "신에츠코리아": "https://www.shinetsu.co.kr/", "KCC": "https://recruit.kcc.co.kr/", "LG화학": "https://apply.lgchem.com/", "롯데케미칼": "https://job.lotte.co.kr/", "서울반도체": "https://www.seoulsemicon.com/kr/company/Recruitment/", "일진다이아몬드": "https://www.iljindiamond.co.kr/", "삼화콘덴서": "https://www.samwha.com/", "SEMCNS": "https://www.semcns.com/", "STM": "https://www.stmc.co.kr/", "삼성디스플레이": "https://www.samsungcareers.com/hr/", "LG디스플레이": "https://apply.lgdisplay.com/", "LG에너지솔루션": "https://careers.lgensol.com/", "삼성SDI": "https://www.samsungcareers.com/hr/", "SK온": "https://www.skcareers.com/", "포스코퓨처엠": "https://recruit.poscofuturem.com/", "에코프로비엠": "https://www.ecopro.co.kr/recruit", "롯데에너지머티리얼즈": "https://job.lotte.co.kr/", "두산에너빌리티": "https://career.doosan.com/", "두산퓨얼셀": "https://career.doosan.com/", "한화큐셀": "https://www.hanwhain.com/web/careers/", "동원시스템즈": "https://www.dongwonsystems.com/", "유진테크놀로지": "https://www.eugene-tech.com/", "델코": "https://www.delkor.co.kr/", "유진테크": "https://eugenetech.co.kr/recruit/", "테스": "https://www.tes.co.kr/", "케이씨텍": "https://www.kctech.co.kr/", "이오테크닉스": "https://www.eotechnics.com/", "GST": "https://www.gst-in.com/", "유니셈": "https://www.unisem.co.kr/", "원익QnC": "https://www.wonikqnc.com/", "하나머티리얼즈": "https://www.hanamaterials.com/", "코미코": "https://www.komico.com/", "디엔에프": "https://www.dnfsolution.com/", "미코": "https://www.mico.kr/", "엠케이전자": "https://www.mke.co.kr/", "하나마이크론": "https://www.hanamicron.com/", "두산테스나": "https://career.doosan.com/", "SFA반도체": "https://www.sfareflow.com/", "엘앤에프": "https://www.landf.co.kr/", "에코프로머티리얼즈": "https://www.ecopro.co.kr/recruit", "SK아이이테크놀로지": "https://www.skcareers.com/", "대주전자재료": "https://www.daejoo.co.kr/", "나노신소재": "https://www.anapro.com/", "성일하이텍": "https://www.seihitech.com/"};
 const STATUSES = ["미지원","관심","지원 예정","서류 제출","서류 합격","인적성/시험","면접","최종합격","불합격"];
 // 자사/그룹/글로벌 채용사이트 위주 기업 → 사람인 자동수집에 안 잡힐 수 있음
 const OWN_PORTAL = new Set([
@@ -481,8 +482,8 @@ const DL_COLOR = "#1B3A6B";
 
 /* ================= 저장소 ================= */
 /* ═══════════ Supabase 설정 — SETUP_GUIDE.txt 3단계에서 붙여넣기 ═══════════ */
-const SUPABASE_URL = "https://riqvhsehmrekdwkqievv.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcXZoc2VobXJla2R3a3FpZXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3MDIxMDEsImV4cCI6MjEwMTI3ODEwMX0.YoW5oBc3VtZbGRnb5oTq1gWiajX4kDbOfWuoBkRHrAk";
+const SUPABASE_URL = "여기에_Project_URL_붙여넣기";
+const SUPABASE_ANON_KEY = "여기에_anon_public_key_붙여넣기";
 /* ═══════════════════════════════════════════════════════════════════ */
 let sbClient = null, UID = null;
 function flash(msg){
@@ -626,7 +627,7 @@ function renderBoard(){
       +'<div class="c-ctrl"><select class="statusSel">'+STATUSES.map(s=>'<option '+(s===r.status?"selected":"")+'>'+s+'</option>').join("")+'</select>'
       +'<input type="date" class="dl" value="'+r.deadline+'" title="지원 마감일">'+ddayBadge(dd)+'</div>'
       +'<div class="links">'
-      +(url?'<a class="l-off" href="'+esc(url)+'" target="_blank" rel="noopener">공식 채용 ↗</a>':"")
+      +(url?'<a class="l-off" href="'+esc(url)+'" target="_blank" rel="noopener">채용공고 ↗</a>':"")
       +'<a class="l-sr" href="'+portal.sr(n)+'" target="_blank" rel="noopener">사람인</a>'
       +'<a class="l-jk" href="'+portal.jk(n)+'" target="_blank" rel="noopener">잡코리아</a>'
       +'<a class="l-wt" href="'+portal.wt(n)+'" target="_blank" rel="noopener">원티드</a>'
