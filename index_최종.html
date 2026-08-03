@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>채용 트래커 · 반도체 & 배터리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#0F1E3D; --navy:#1B3A6B; --navy-d:#122A50; --teal:#0E9594; --teal-l:#E3F4F3;
+  --bg:#F4F6FB; --card:#FFFFFF; --line:#DCE3F0; --sub:#5B6B8C;
+  --warn:#D9414B; --warn-bg:#FCEBEC; --amber:#C97F17; --amber-bg:#FBF1DF;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.5;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit; font-size:14px; color:var(--ink);}
+
+/* ---------- header ---------- */
+header{background:linear-gradient(135deg,var(--navy-d) 0%, var(--navy) 62%, #14507A 100%); color:#fff; padding:26px 22px 0;}
+.hd-inner{max-width:1180px; margin:0 auto;}
+.hd-top{display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px;}
+.hd-eyebrow{font-size:12px; letter-spacing:.14em; color:#9FC3D9; font-weight:600;}
+h1{font-size:26px; font-weight:800; letter-spacing:-.01em; margin-top:4px;}
+h1 .teal{color:#5ED4CE;}
+.hd-stats{display:flex; gap:10px; flex-wrap:wrap;}
+.stat{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16); border-radius:10px; padding:8px 14px; text-align:center; min-width:82px;}
+.stat b{display:block; font-size:20px; font-weight:800; line-height:1.2;}
+.stat span{font-size:11.5px; color:#B9CCE6;}
+.ticker{max-width:1180px; margin:16px auto 0; display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin;}
+.ticker:empty{display:none;}
+.tick{flex:0 0 auto; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:6px 14px 6px 8px; font-size:13px; color:#EAF1FA; cursor:pointer; transition:background .15s;}
+.tick:hover{background:rgba(255,255,255,.2);}
+.tick .dd{font-weight:800; font-size:12px; border-radius:999px; padding:2px 9px; background:#5ED4CE; color:#0B2A29;}
+.tick .dd.urgent{background:#FF8B93; color:#4A0A10;}
+.tick .dot{width:8px; height:8px; border-radius:50%;}
+/* tabs */
+.tabs{max-width:1180px; margin:16px auto 0; display:flex; gap:4px;}
+.tab{background:rgba(255,255,255,.10); color:#C8D8EE; border:none; padding:11px 22px; font-size:14.5px; font-weight:700; border-radius:12px 12px 0 0;}
+.tab.on{background:var(--bg); color:var(--navy);}
+
+/* ---------- toolbar ---------- */
+.toolbar{max-width:1180px; margin:18px auto 0; padding:0 22px; display:flex; flex-direction:column; gap:10px;}
+.row1{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.search{flex:1 1 240px; position:relative;}
+.search input{width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none;}
+.search input:focus{border-color:var(--teal);}
+.search svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; stroke:var(--sub);}
+.row1 select{padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none;}
+.btn{padding:10px 14px; border-radius:10px; border:1.5px solid var(--line); background:var(--card); font-size:13.5px; font-weight:600; color:var(--navy); transition:all .15s;}
+.btn:hover{border-color:var(--navy);}
+.btn.small{padding:7px 12px; font-size:12.5px;}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#fff;}
+.btn.primary:hover{filter:brightness(.94);}
+.chips{display:flex; gap:7px; flex-wrap:wrap;}
+.chip{padding:7px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--card); font-size:13px; font-weight:600; color:var(--sub); transition:all .15s;}
+.chip:hover{border-color:var(--navy); color:var(--navy);}
+.chip.on{background:var(--navy); border-color:var(--navy); color:#fff;}
+.chip.on.tealchip{background:var(--teal); border-color:var(--teal);}
+
+/* ---------- grid ---------- */
+main{max-width:1180px; margin:16px auto 60px; padding:0 22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px;}
+.empty{grid-column:1/-1; text-align:center; color:var(--sub); padding:60px 0; font-size:15px;}
+.card{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:16px 16px 14px; display:flex; flex-direction:column; gap:10px; transition:box-shadow .15s, border-color .15s;}
+.card:hover{box-shadow:0 4px 18px rgba(15,30,61,.08);}
+.card.fav{border-color:var(--teal);}
+.card.done{opacity:.55;}
+.c-top{display:flex; align-items:flex-start; gap:8px;}
+.c-name{font-size:16.5px; font-weight:800; letter-spacing:-.01em; flex:1; line-height:1.3;}
+.c-name small{display:block; font-size:11.5px; color:var(--sub); font-weight:500; margin-top:1px;}
+.star{background:none; border:none; font-size:20px; line-height:1; color:#C8D2E4; padding:2px; transition:transform .12s;}
+.star:hover{transform:scale(1.2);}
+.star.on{color:#F0B429;}
+.cat{align-self:flex-start; font-size:11px; font-weight:700; letter-spacing:.04em; padding:3px 9px; border-radius:6px; background:var(--teal-l); color:var(--teal);}
+.cat.c0{background:#E7ECF7; color:var(--navy);}
+.cat.c5{background:#FBF1DF; color:var(--amber);}
+.c-ctrl{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.c-ctrl select{flex:1; min-width:110px; padding:7px 9px; border:1.5px solid var(--line); border-radius:8px; background:#FAFBFE; font-size:13px; outline:none;}
+.c-ctrl select:focus{border-color:var(--teal);}
+.c-ctrl input[type=date]{padding:6px 8px; border:1.5px solid var(--line); border-radius:8px; background:#FAFBFE; font-size:12.5px; outline:none; width:138px;}
+.dday{font-size:12px; font-weight:800; border-radius:999px; padding:3px 10px; white-space:nowrap;}
+.dday.safe{background:var(--teal-l); color:var(--teal);}
+.dday.soon{background:var(--amber-bg); color:var(--amber);}
+.dday.urgent{background:var(--warn-bg); color:var(--warn);}
+.dday.past{background:#EEF1F7; color:#93A0BA; text-decoration:line-through;}
+.links{display:flex; gap:6px; flex-wrap:wrap;}
+.links a{font-size:12.5px; font-weight:700; text-decoration:none; padding:6px 11px; border-radius:8px; transition:filter .12s;}
+.links a:hover{filter:brightness(.92);}
+.l-off{background:var(--navy); color:#fff;}
+.l-sr,.l-jk,.l-wt{background:#EEF2FA; color:#3A5AA0;}
+.l-edit{background:none; border:none; color:var(--sub); font-size:12px; padding:6px 4px; text-decoration:underline dotted;}
+.memo{width:100%; border:1.5px dashed var(--line); border-radius:8px; background:#FBFCFE; padding:8px 10px; font-size:13px; resize:vertical; min-height:34px; outline:none; color:var(--ink);}
+.memo:focus{border-style:solid; border-color:var(--teal);}
+.memo::placeholder{color:#A9B4CA;}
+
+/* ---------- calendar ---------- */
+#calView{max-width:1180px; margin:18px auto 60px; padding:0 22px; display:none; flex-direction:column; gap:16px;}
+.cal-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+.cal-title{font-size:22px; font-weight:800; letter-spacing:-.01em;}
+.cal-nav{display:flex; gap:6px;}
+.cal-wrap{background:var(--card); border:1.5px solid var(--line); border-radius:14px; overflow:hidden;}
+.cal-dow{display:grid; grid-template-columns:repeat(7,1fr); background:#F0F3FA; border-bottom:1.5px solid var(--line);}
+.cal-dow div{text-align:center; font-size:12.5px; font-weight:700; color:var(--sub); padding:9px 0;}
+.cal-dow div:first-child{color:var(--warn);}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr);}
+.cell{min-height:104px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:6px; cursor:pointer; transition:background .12s; display:flex; flex-direction:column; gap:3px; overflow:hidden;}
+.cell:nth-child(7n){border-right:none;}
+.cell:hover{background:#F7F9FD;}
+.cell.other{background:#FAFBFD; color:#B7C1D6;}
+.cell .dnum{font-size:12.5px; font-weight:700; align-self:flex-start; padding:1px 6px; border-radius:6px;}
+.cell.sun .dnum{color:var(--warn);}
+.cell.today .dnum{background:var(--teal); color:#fff;}
+.evchip{font-size:11px; font-weight:700; color:#fff; background:var(--c,#5B6B8C); border-radius:5px; padding:2px 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.evchip.more{background:#EEF1F7; color:var(--sub);}
+.cal-side{display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;}
+.panel{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:16px;}
+.panel h3{font-size:15px; font-weight:800; margin-bottom:10px;}
+.evform{display:flex; flex-direction:column; gap:8px;}
+.evform .frow{display:flex; gap:8px; flex-wrap:wrap;}
+.evform input,.evform select{padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; background:#FAFBFE; outline:none;}
+.evform input:focus,.evform select:focus{border-color:var(--teal);}
+.evform input[type=text]{flex:1; min-width:150px;}
+.legend{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;}
+.legend span{display:flex; align-items:center; gap:5px; font-size:12px; color:var(--sub); font-weight:600;}
+.legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+.res-list{display:flex; flex-direction:column; gap:8px;}
+.res-list a{display:flex; justify-content:space-between; align-items:center; gap:8px; text-decoration:none; color:var(--ink); font-size:13.5px; font-weight:600; padding:9px 12px; border:1.5px solid var(--line); border-radius:9px; transition:border-color .12s;}
+.res-list a:hover{border-color:var(--teal);}
+.res-list a small{color:var(--sub); font-weight:500; font-size:11.5px;}
+.res-note{font-size:12px; color:var(--sub); margin-top:10px; line-height:1.6;}
+
+/* modal */
+#overlay{position:fixed; inset:0; background:rgba(15,30,61,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;}
+#overlay.show{display:flex;}
+.modal{background:#fff; border-radius:14px; padding:20px; max-width:420px; width:100%; max-height:80vh; overflow:auto;}
+.modal h3{font-size:16px; font-weight:800; margin-bottom:6px;}
+.modal .mline{font-size:13.5px; color:var(--sub); margin-bottom:4px;}
+.modal .mmemo{font-size:13.5px; background:#F7F9FD; border-radius:8px; padding:8px 10px; margin:8px 0; white-space:pre-wrap;}
+.modal .mbtns{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+.mlist{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
+.mlist .evchip{font-size:12.5px; padding:6px 10px; cursor:pointer;}
+
+/* ---------- jobs view ---------- */
+#jobsView{max-width:1180px; margin:18px auto 60px; padding:0 22px; display:none; flex-direction:column; gap:14px;}
+.jobs-head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+.upd{font-size:12.5px; color:var(--sub); margin-top:3px;}
+.jctrl{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+.jctrl select{padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none;}
+.jctrl input{padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none; min-width:200px;}
+.jctrl input:focus,.jctrl select:focus{border-color:var(--teal);}
+.jrow{background:var(--card); border:1.5px solid var(--line); border-radius:12px; padding:13px 16px; display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; transition:border-color .12s;}
+.jrow:hover{border-color:var(--navy);}
+.jmain{flex:1 1 320px; min-width:0;}
+.jco{display:inline-block; font-size:11.5px; font-weight:800; color:#fff; background:var(--navy); border-radius:6px; padding:2px 8px; margin-bottom:4px;}
+.jco.c5{background:var(--amber);}
+.jco.c3,.jco.c4{background:var(--teal);}
+.gcbadge{display:inline-block; font-size:11px; font-weight:800; color:var(--warn); background:var(--warn-bg); border-radius:6px; padding:2px 8px; margin-left:5px; margin-bottom:4px; vertical-align:top;}
+.jtitle{display:block; font-size:14.5px; font-weight:700; color:var(--ink); text-decoration:none; line-height:1.4;}
+.jtitle:hover{color:var(--teal); text-decoration:underline;}
+.jsub{font-size:12px; color:var(--sub); margin-top:2px;}
+.jside{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.jexp{font-size:12.5px; color:var(--sub);}
+.setup{background:var(--card); border:1.5px dashed var(--line); border-radius:14px; padding:22px; line-height:1.8; font-size:14px;}
+.setup h3{font-size:16px; font-weight:800; margin-bottom:8px;}
+.setup ol{margin-left:20px;}
+.setup code{background:#EEF2FA; border-radius:5px; padding:1px 7px; font-size:12.5px; color:var(--navy);}
+.setup a{color:var(--teal); font-weight:700;}
+.jobbadge{align-self:flex-start; font-size:11px; font-weight:800; padding:3px 9px; border-radius:6px; background:var(--warn-bg); color:var(--warn); margin-left:6px;}
+.ownbadge{align-self:flex-start; font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; background:var(--amber-bg); color:var(--amber); margin-left:6px; cursor:help;}
+.ownbadge.alert{background:var(--warn-bg); color:var(--warn); font-weight:800;}
+
+/* ---------- activities view ---------- */
+#actView{max-width:1180px; margin:18px auto 60px; padding:0 22px; display:none; flex-direction:column; gap:20px;}
+.act-group h2{font-size:17px; font-weight:800; margin-bottom:4px;}
+.act-group .gdesc{font-size:13px; color:var(--sub); margin-bottom:10px;}
+.act-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px;}
+.act-card{background:var(--card); border:1.5px solid var(--line); border-radius:13px; padding:15px 16px; display:flex; flex-direction:column; gap:8px; transition:border-color .12s;}
+.act-card:hover{border-color:var(--teal);}
+.act-card h4{font-size:15px; font-weight:800;}
+.act-card .why{font-size:13px; color:var(--sub); line-height:1.55; flex:1;}
+.act-card .why b{color:var(--teal);}
+.act-btns{display:flex; gap:6px; flex-wrap:wrap;}
+.act-btns a{font-size:12.5px; font-weight:700; text-decoration:none; padding:6px 12px; border-radius:8px; background:var(--navy); color:#fff;}
+.act-btns a:hover{filter:brightness(.92);}
+.act-tag{align-self:flex-start; font-size:10.5px; font-weight:800; letter-spacing:.03em; padding:2px 8px; border-radius:5px;}
+
+/* ---------- STAR view ---------- */
+#starView{max-width:1180px; margin:18px auto 60px; padding:0 22px; display:none; flex-direction:column; gap:14px;}
+.star-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.star-head .hint{font-size:12.5px; color:var(--sub);}
+.star-grid{display:flex; flex-direction:column; gap:10px; max-width:880px;}
+.scard{background:var(--card); border:1.5px solid var(--line); border-radius:14px; overflow:hidden;}
+.scard:focus-within{border-color:var(--teal);}
+.shead{width:100%; display:flex; align-items:center; gap:10px; padding:13px 16px; background:none; border:none; text-align:left; font-family:inherit; cursor:pointer;}
+.shead:hover{background:#F7F9FD;}
+.scatchip{flex:0 0 auto; font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; color:#fff; background:var(--sc,#5B6B8C);}
+.shead-title{flex:1; font-size:15px; font-weight:800; color:var(--ink); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.shead-title.empty{color:#A9B4CA; font-weight:600;}
+.shead-period{font-size:12px; color:var(--sub); white-space:nowrap;}
+.scaret{color:var(--sub); font-size:13px; transition:transform .15s; flex:0 0 auto;}
+.scard.open .scaret{transform:rotate(90deg);}
+.sbody{display:none; flex-direction:column; gap:9px; padding:12px 16px 16px; border-top:1px dashed var(--line);}
+.scard.open .sbody{display:flex;}
+.srow{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+.scard input[type=text]{padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; background:#FAFBFE; outline:none; font-size:13.5px;}
+.scard input:focus, .scard textarea:focus, .scard select:focus{border-color:var(--teal);}
+.stitle{flex:1; min-width:200px; font-weight:800; font-size:15px !important;}
+.scard select{padding:8px 9px; border:1.5px solid var(--line); border-radius:8px; background:#FAFBFE; font-size:13px; outline:none;}
+.speriod{width:180px;} .sskills{flex:1; min-width:180px;}
+.sfield{display:flex; gap:8px;}
+.sfield .slabel{flex:0 0 26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#fff; margin-top:2px;}
+.sl-s{background:var(--navy);} .sl-t{background:var(--teal);} .sl-a{background:var(--amber);} .sl-r{background:var(--warn);}
+.sfield textarea{flex:1; border:1.5px solid var(--line); border-radius:8px; background:#FBFCFE; padding:7px 10px; font-size:13px; line-height:1.55; resize:vertical; min-height:44px; outline:none; color:var(--ink);}
+.sfield textarea::placeholder{color:#A9B4CA;}
+.sdel{background:none; border:none; color:#C0CADD; font-size:16px; padding:2px 6px;}
+.sdel:hover{color:var(--warn);}
+.scopy{align-self:flex-start;}
+
+footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; color:var(--sub);}
+.savebar{position:fixed; bottom:18px; right:18px; background:var(--ink); color:#fff; font-size:12.5px; padding:8px 14px; border-radius:999px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:60;}
+.savebar.show{opacity:.92;}
+
+@media (max-width:760px){
+  h1{font-size:21px;}
+  .hd-stats{width:100%;}
+  .stat{flex:1; min-width:0;}
+  main{grid-template-columns:1fr;}
+  .cal-side{grid-template-columns:1fr;}
+  .cell{min-height:76px; padding:4px;}
+  .evchip{font-size:9.5px; padding:1px 4px;}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+.chip.navychip.on{background:#1B3A6B;border-color:#1B3A6B;color:#fff;}
+.sizebadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:2px;}
+.sz-대{background:#E8EDF7;color:#1B3A6B;}
+.sz-중견{background:#E3F4F3;color:#0E9594;}
+.sz-중소{background:#FDF0E3;color:#C77D2E;}
+.sz-외국{background:#F3E9F7;color:#8E44AD;}
+.btn.on-teal{background:var(--teal);border-color:var(--teal);color:#fff;}
+.evchip.done-chip{opacity:.6;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-inner">
+    <div class="hd-top">
+      <div>
+        <div class="hd-eyebrow">JEONGYUN'S JOB BOARD · MY SITE</div>
+        <h1>채용 트래커 <span class="teal">/</span> 반도체 · 배터리</h1>
+        <div style="font-size:11.5px; color:#B9CCE6; margin-top:4px;">☁ 클라우드 동기화 — 어떤 기기에서 접속해도 이어져요
+          <button id="logoutBtn" style="display:none; margin-left:8px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:#DCE8F5; border-radius:999px; padding:2px 10px; font-size:11px; cursor:pointer;">로그아웃</button>
+        </div>
+      </div>
+      <div class="hd-stats">
+        <div class="stat"><b id="stTotal">0</b><span>전체 기업</span></div>
+        <div class="stat"><b id="stFav">0</b><span>관심 기업</span></div>
+        <div class="stat"><b id="stActive">0</b><span>진행 중</span></div>
+        <div class="stat"><b id="stSoon">0</b><span>7일 내 일정</span></div>
+      </div>
+    </div>
+    <div class="ticker" id="ticker"></div>
+    <nav class="tabs">
+      <button class="tab on" data-tab="board">기업 보드</button>
+      <button class="tab" data-tab="cal">월간 달력</button>
+      <button class="tab" data-tab="jobs" id="jobsTab">최신 공고</button>
+      <button class="tab" data-tab="act">교육·대외활동</button>
+      <button class="tab" data-tab="star">활동기록 STAR</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ 기업 보드 ============ -->
+<div id="boardView">
+  <div class="toolbar">
+    <div class="row1">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="text" placeholder="기업명 검색 (예: 하이닉스, 램리서치)">
+      </div>
+      <select id="sort">
+        <option value="default">정렬: 즐겨찾기 우선</option>
+        <option value="deadline">정렬: 마감 임박순</option>
+        <option value="name">정렬: 이름순</option>
+      </select>
+      <button class="btn small" id="exportBtn">백업 저장</button>
+      <button class="btn small" id="importBtn">백업 불러오기</button>
+      <input type="file" id="importFile" accept=".json" hidden>
+    </div>
+    <div class="chips" id="catChips"></div>
+    <div class="chips">
+      <button class="chip tealchip" data-tg="fav">⭐ 즐겨찾기만</button>
+      <button class="chip tealchip" data-tg="active">진행 중만</button>
+      <button class="chip tealchip" data-tg="hideDone">종료 숨기기</button>
+    </div>
+  </div>
+  <main id="grid"></main>
+</div>
+
+<!-- ============ 월간 달력 ============ -->
+<div id="calView">
+  <div class="cal-head">
+    <div class="cal-title" id="calTitle"></div>
+    <div class="cal-nav">
+      <button class="btn small" id="calDoneFilter" title="신청 완료 체크한 일정만 보기">☑ 신청한 것만</button>
+      <button class="btn small" id="calPrev">◀ 이전 달</button>
+      <button class="btn small" id="calToday">오늘</button>
+      <button class="btn small" id="calNext">다음 달 ▶</button>
+    </div>
+  </div>
+  <div class="cal-wrap">
+    <div class="cal-dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <div class="cal-side">
+    <div class="panel">
+      <h3>일정 추가</h3>
+      <div class="evform">
+        <input type="text" id="evTitle" placeholder="일정 이름 (예: 서울대 반도체공동연구소 공정실습)">
+        <div class="frow">
+          <input type="date" id="evDate" title="시작일">
+          <input type="date" id="evEnd" title="종료일 (선택)">
+          <select id="evType">
+            <option>공정실습</option><option>교육/부트캠프</option><option>자격증/시험</option>
+            <option>발표/면접</option><option>기타</option>
+          </select>
+        </div>
+        <input type="text" id="evLink" placeholder="관련 링크 (선택)">
+        <input type="text" id="evMemo" placeholder="메모 (선택)">
+        <button class="btn primary" id="addEvBtn">달력에 추가</button>
+      </div>
+      <div class="res-note">기업 카드에 입력한 <b>채용 마감일</b>은 달력에 자동으로 표시돼요. 일정을 클릭하면 상세 확인·삭제가 가능합니다. 빈 날짜를 클릭하면 그 날짜로 일정 추가 폼이 채워져요.</div>
+    </div>
+    <div class="panel">
+      <h3>공정실습 · 교육 모집공고 바로가기</h3>
+      <div class="res-list">
+        <a href="https://isrc.snu.ac.kr" target="_blank" rel="noopener">서울대 반도체공동연구소 <small>학부생 공정실습 (인기 高)</small></a>
+        <a href="https://www.nnfc.re.kr" target="_blank" rel="noopener">나노종합기술원 (NNFC) <small>공정·계측 실습 교육</small></a>
+        <a href="https://www.kanc.re.kr" target="_blank" rel="noopener">한국나노기술원 (KANC) <small>반도체 공정 교육</small></a>
+        <a href="https://www.idec.or.kr" target="_blank" rel="noopener">IDEC 반도체설계교육센터 <small>설계·공정 강좌</small></a>
+        <a href="https://www.ksia.or.kr" target="_blank" rel="noopener">한국반도체산업협회 <small>반도체 인력양성 프로그램</small></a>
+      </div>
+      <div class="res-note">모집 시기가 기관마다 수시로 열려요. 사이트에서 공고를 확인하면 접수 마감일을 바로 왼쪽 폼으로 달력에 등록해두세요.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 최신 공고 ============ -->
+<div id="jobsView">
+  <div class="jobs-head">
+    <div>
+      <div class="cal-title">수집된 최신 공고</div>
+      <div class="upd" id="jobsUpdated"></div>
+    </div>
+    <div class="jctrl">
+      <input type="text" id="jq" placeholder="공고 제목 · 기업명 검색">
+      <select id="jcat"><option value="-1">전체 분야</option></select>
+      <select id="jsort">
+        <option value="exp">마감 임박순</option>
+        <option value="new">최신 등록순</option>
+      </select>
+      <button class="btn small" id="jobsReload" title="공고 데이터를 다시 불러옵니다">🔄 새로고침</button>
+    </div>
+  </div>
+  <div id="jobsList" style="display:flex; flex-direction:column; gap:9px;"></div>
+</div>
+
+<!-- ============ 교육·대외활동 ============ -->
+<div id="actView"></div>
+
+<!-- ============ 활동기록 STAR ============ -->
+<div id="starView">
+  <div class="star-head">
+    <div>
+      <div class="cal-title">활동기록 · STAR</div>
+      <div class="hint">Situation(상황) → Task(과제) → Action(행동) → Result(결과). 자소서·면접 답변의 원재료로 쌓아두세요. 입력하면 자동 저장돼요.</div>
+    </div>
+    <div class="srow">
+      <select id="scat"><option value="전체">전체 분류</option></select>
+      <button class="btn primary" id="addStarBtn">+ 새 활동 추가</button>
+    </div>
+  </div>
+  <div class="star-grid" id="starGrid"></div>
+</div>
+
+<footer>
+  💡 <b>사용 팁</b> — 이 파일을 바탕화면 등에 저장해두고 브라우저로 열면 모든 입력이 자동 저장됩니다.
+  공식 채용 링크가 바뀌었으면 카드의 "링크 수정"으로 고칠 수 있고, 포털 링크는 클릭할 때마다 항상 최신 공고를 보여줍니다.
+  다른 PC로 옮길 땐 "백업 저장 → 불러오기"를 사용하세요 (달력 일정도 함께 백업돼요).
+  <br>🏷 <b>뱃지 안내</b> — <span style="color:var(--warn); font-weight:700">공고 N건</span>: 자동수집된 진행 중 공고 수 ·
+  <span style="color:var(--amber); font-weight:700">자사채용 위주</span>: 사람인 자동수집에 누락될 수 있는 기업 (공식 채용 링크 병행 확인) ·
+  <span style="color:var(--warn); font-weight:700">⚠ 수집 0건</span>: 이번 수집에 안 잡힌 자사채용 위주 기업 — 공고가 없다는 뜻이 아니니 꼭 공식페이지를 확인하세요.
+</footer>
+
+<div id="overlay"><div class="modal" id="modalBox"></div></div>
+<div class="savebar" id="savebar">저장됨 ✓</div>
+
+<div id="bootMsg" style="max-width:600px; margin:60px auto; padding:0 20px; text-align:center; color:var(--sub); line-height:1.8;">☁ 연결 중...</div>
+
+<div id="loginGate" style="display:none; position:fixed; inset:0; background:rgba(15,30,61,.55); z-index:70; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; border-radius:16px; padding:26px; max-width:380px; width:100%;">
+    <div style="font-size:18px; font-weight:800; margin-bottom:4px;">☁ 내 트래커 로그인</div>
+    <div id="loginHint" style="font-size:12.5px; color:var(--sub); margin-bottom:14px; line-height:1.6;">이메일로 6자리 인증코드를 받아 로그인하면, 어떤 기기에서든 같은 데이터가 이어져요. 비밀번호는 없어요.</div>
+    <div style="display:flex; flex-direction:column; gap:9px;">
+      <input type="email" id="loginEmail" placeholder="이메일 주소" style="padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; outline:none;">
+      <button class="btn primary" id="otpSendBtn" style="padding:11px;">인증코드 받기</button>
+      <div id="otpStep2" style="display:none; flex-direction:column; gap:9px;">
+        <input type="text" id="loginCode" placeholder="6자리 인증코드" inputmode="numeric" style="padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; outline:none; letter-spacing:.2em; text-align:center; font-weight:800;">
+        <button class="btn primary" id="otpVerifyBtn" style="padding:11px; background:var(--navy); border-color:var(--navy);">로그인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="jobs.js"></script>
+<script>
+/* ================= 데이터 ================= */
+const CATS = ["칩 제조","반도체 장비","패키징·후공정","소재·부품","디스플레이","배터리·에너지"];
+const COMPANIES = [
+["삼성전자 DS","Samsung Electronics",0,"https://www.samsungcareers.com"],
+["SK하이닉스","SK hynix",0,"https://recruit.skhynix.com"],
+["마이크론코리아","Micron",0,"https://careers.micron.com"],
+["매그나칩반도체","Magnachip",0,"https://www.magnachip.com"],
+["온세미","onsemi",0,"https://www.onsemi.com/careers"],
+["어플라이드머티어리얼즈","Applied Materials",1,"https://careers.appliedmaterials.com"],
+["ASML코리아","ASML",1,"https://www.asml.com/careers"],
+["도쿄일렉트론코리아","TEL",1,"https://www.tel.com/careers/"],
+["램리서치코리아","Lam Research",1,"https://careers.lamresearch.com"],
+["원익IPS","WONIK IPS",1,"https://recruit.wonik.com"],
+["주성엔지니어링","Jusung Engineering",1,"https://www.jseng.com"],
+["PSK","PSK Inc.",1,"https://www.psk-inc.com"],
+["선익시스템","Sunic System",1,""],
+["참엔지니어링","Charm Engineering",1,""],
+["캐논코리아","Canon Korea",1,""],
+["네패스","nepes",2,"https://www.nepes.co.kr"],
+["앰코테크놀로지코리아","Amkor",2,"https://www.amkor.com/careers/"],
+["한미반도체","Hanmi Semiconductor",2,"https://www.hanmisemi.com"],
+["LB세미콘","LB Semicon",2,"https://www.lbsemicon.com"],
+["스태츠칩팩코리아","STATS ChipPAC",2,""],
+["ASE코리아","ASE Korea",2,""],
+["삼성전기","Samsung Electro-Mechanics",3,"https://www.samsungcareers.com"],
+["SK실트론","SK siltron",3,"https://www.skcareers.com"],
+["동진쎄미켐","Dongjin Semichem",3,"https://www.dongjin.com"],
+["솔브레인","Soulbrain",3,"https://www.soulbrain.co.kr"],
+["티씨케이","TCK (Tokai Carbon Korea)",3,"https://www.tck.co.kr"],
+["동우화인켐","Dongwoo Fine-Chem",3,"https://www.dwchem.co.kr"],
+["도레이첨단소재","Toray Advanced Materials",3,""],
+["신에츠코리아","Shin-Etsu Korea",3,""],
+["KCC","케이씨씨",3,"https://www.kccworld.co.kr"],
+["LG화학","LG Chem",3,"https://careers.lg.com"],
+["롯데케미칼","Lotte Chemical",3,"https://job.lotte.co.kr"],
+["서울반도체","Seoul Semiconductor",3,"https://www.seoulsemicon.com"],
+["일진다이아몬드","Iljin Diamond",3,""],
+["삼화콘덴서","Samwha Capacitor",3,""],
+["SEMCNS","셈씨엔에스",3,""],
+["STM","에스티엠",3,""],
+["삼성디스플레이","Samsung Display",4,"https://www.samsungcareers.com"],
+["LG디스플레이","LG Display",4,"https://careers.lg.com"],
+["LG에너지솔루션","LG Energy Solution",5,"https://careers.lg.com"],
+["삼성SDI","Samsung SDI",5,"https://www.samsungcareers.com"],
+["SK온","SK on",5,"https://www.skcareers.com"],
+["포스코퓨처엠","POSCO Future M",5,"https://www.poscofuturem.com"],
+["에코프로비엠","EcoPro BM",5,"https://www.ecopro.co.kr"],
+["롯데에너지머티리얼즈","Lotte Energy Materials",5,"https://job.lotte.co.kr"],
+["두산에너빌리티","Doosan Enerbility",5,"https://career.doosan.com"],
+["두산퓨얼셀","Doosan Fuel Cell",5,"https://career.doosan.com"],
+["한화큐셀","Hanwha Qcells (한화솔루션)",5,"https://www.hanwhain.com"],
+["동원시스템즈","Dongwon Systems",5,""],
+["유진테크놀로지","Eugene Technology",5,""],
+["델코","Delkor",5,""]
+];
+const RECRUIT = {"삼성전자 DS": "https://www.samsungcareers.com/hr/", "SK하이닉스": "https://www.skcareers.com/", "마이크론코리아": "https://careers.micron.com/careers", "매그나칩반도체": "https://www.magnachip.com/careers/", "온세미": "https://careers.onsemi.com/", "어플라이드머티어리얼즈": "https://careers.appliedmaterials.com/careers", "ASML코리아": "https://www.asml.com/en/careers/find-a-job", "도쿄일렉트론코리아": "https://www.tel.com/careers/", "램리서치코리아": "https://lamresearch-careers.com/", "원익IPS": "https://recruit.wonik.com/", "주성엔지니어링": "https://jusung.career.greetinghr.com/", "PSK": "https://www.psk-inc.com/recruit/", "선익시스템": "https://www.sunic.co.kr/", "참엔지니어링": "https://www.charmeng.com/", "캐논코리아": "https://www.canon-korea.co.kr/", "네패스": "https://www.nepes.co.kr/recruit", "앰코테크놀로지코리아": "https://www.amkor.com/careers/", "한미반도체": "https://www.hanmisemi.com/", "LB세미콘": "https://www.lbsemicon.com/", "스태츠칩팩코리아": "https://www.statschippac.com/careers", "ASE코리아": "https://www.aseglobal.com/en/careers/", "삼성전기": "https://www.samsungcareers.com/hr/", "SK실트론": "https://www.skcareers.com/", "동진쎄미켐": "https://www.dongjin.com/", "솔브레인": "https://www.soulbrain.co.kr/recruit/", "티씨케이": "https://www.tckcorp.com/", "동우화인켐": "https://www.dwchem.co.kr/", "도레이첨단소재": "https://www.torayamk.com/", "신에츠코리아": "https://www.shinetsu.co.kr/", "KCC": "https://recruit.kcc.co.kr/", "LG화학": "https://apply.lgchem.com/", "롯데케미칼": "https://job.lotte.co.kr/", "서울반도체": "https://www.seoulsemicon.com/kr/company/Recruitment/", "일진다이아몬드": "https://www.iljindiamond.co.kr/", "삼화콘덴서": "https://www.samwha.com/", "SEMCNS": "https://www.semcns.com/", "STM": "https://www.stmc.co.kr/", "삼성디스플레이": "https://www.samsungcareers.com/hr/", "LG디스플레이": "https://apply.lgdisplay.com/", "LG에너지솔루션": "https://careers.lgensol.com/", "삼성SDI": "https://www.samsungcareers.com/hr/", "SK온": "https://www.skcareers.com/", "포스코퓨처엠": "https://recruit.poscofuturem.com/", "에코프로비엠": "https://www.ecopro.co.kr/recruit", "롯데에너지머티리얼즈": "https://job.lotte.co.kr/", "두산에너빌리티": "https://career.doosan.com/", "두산퓨얼셀": "https://career.doosan.com/", "한화큐셀": "https://www.hanwhain.com/web/careers/", "동원시스템즈": "https://www.dongwonsystems.com/", "유진테크놀로지": "https://www.eugene-tech.com/", "델코": "https://www.delkor.co.kr/", "유진테크": "https://eugenetech.co.kr/recruit/", "테스": "https://www.tes.co.kr/", "케이씨텍": "https://www.kctech.co.kr/", "이오테크닉스": "https://www.eotechnics.com/", "GST": "https://www.gst-in.com/", "유니셈": "https://www.unisem.co.kr/", "원익QnC": "https://www.wonikqnc.com/", "하나머티리얼즈": "https://www.hanamaterials.com/", "코미코": "https://www.komico.com/", "디엔에프": "https://www.dnfsolution.com/", "미코": "https://www.mico.kr/", "엠케이전자": "https://www.mke.co.kr/", "하나마이크론": "https://www.hanamicron.com/", "두산테스나": "https://career.doosan.com/", "SFA반도체": "https://www.sfareflow.com/", "엘앤에프": "https://www.landf.co.kr/", "에코프로머티리얼즈": "https://www.ecopro.co.kr/recruit", "SK아이이테크놀로지": "https://www.skcareers.com/", "대주전자재료": "https://www.daejoo.co.kr/", "나노신소재": "https://www.anapro.com/", "성일하이텍": "https://www.seihitech.com/"};
+const SIZE = {"삼성전자 DS": "대", "삼성전기": "대", "삼성디스플레이": "대", "삼성SDI": "대", "SK하이닉스": "대", "SK실트론": "대", "SK온": "대", "SK아이이테크놀로지": "대", "LG화학": "대", "LG디스플레이": "대", "LG에너지솔루션": "대", "포스코퓨처엠": "대", "롯데케미칼": "대", "롯데에너지머티리얼즈": "대", "두산에너빌리티": "대", "두산퓨얼셀": "대", "두산테스나": "대", "한화큐셀": "대", "동원시스템즈": "대", "KCC": "대", "마이크론코리아": "외국", "온세미": "외국", "어플라이드머티어리얼즈": "외국", "ASML코리아": "외국", "도쿄일렉트론코리아": "외국", "램리서치코리아": "외국", "신에츠코리아": "외국", "ASE코리아": "외국", "스태츠칩팩코리아": "외국", "앰코테크놀로지코리아": "외국", "캐논코리아": "외국", "도레이첨단소재": "외국", "원익IPS": "중견", "주성엔지니어링": "중견", "PSK": "중견", "네패스": "중견", "한미반도체": "중견", "동진쎄미켐": "중견", "솔브레인": "중견", "서울반도체": "중견", "에코프로비엠": "중견", "엘앤에프": "중견", "매그나칩반도체": "중견", "이오테크닉스": "중견", "티씨케이": "중견", "동우화인켐": "중견", "성일하이텍": "중견", "에코프로머티리얼즈": "중견", "하나마이크론": "중견", "SFA반도체": "중견", "유진테크놀로지": "중견", "삼화콘덴서": "중견", "일진다이아몬드": "중견", "코미코": "중견", "원익QnC": "중견", "LB세미콘": "중견", "선익시스템": "중소", "참엔지니어링": "중소", "SEMCNS": "중소", "STM": "중소", "델코": "중소", "유진테크": "중소", "테스": "중소", "케이씨텍": "중견", "GST": "중소", "유니셈": "중소", "하나머티리얼즈": "중소", "디엔에프": "중소", "미코": "중소", "엠케이전자": "중소", "대주전자재료": "중소", "나노신소재": "중소"};
+const STATUSES = ["미지원","관심","지원 예정","서류 제출","서류 합격","인적성/시험","면접","최종합격","불합격"];
+// 자사/그룹/글로벌 채용사이트 위주 기업 → 사람인 자동수집에 안 잡힐 수 있음
+const OWN_PORTAL = new Set([
+"삼성전자 DS","삼성전기","삼성디스플레이","삼성SDI",
+"SK하이닉스","SK실트론","SK온",
+"LG화학","LG디스플레이","LG에너지솔루션",
+"포스코퓨처엠","롯데케미칼","롯데에너지머티리얼즈",
+"두산에너빌리티","두산퓨얼셀","한화큐셀",
+"마이크론코리아","온세미","어플라이드머티리얼즈","어플라이드머티어리얼즈","ASML코리아","도쿄일렉트론코리아","램리서치코리아",
+"신에츠코리아","ASE코리아","스태츠칩팩코리아"
+]);
+const ACTIVE_SET = new Set(["지원 예정","서류 제출","서류 합격","인적성/시험","면접"]);
+const APPLIED_SET = new Set(["지원 예정","서류 제출","서류 합격","인적성/시험","면접","최종합격"]);
+const DONE_SET = new Set(["최종합격","불합격"]);
+const ETYPES = {"공정실습":"#0E9594","교육/부트캠프":"#3A5AA0","자격증/시험":"#7C4DBE","발표/면접":"#C97F17","기타":"#5B6B8C"};
+const DL_COLOR = "#1B3A6B";
+
+/* ================= 저장소 ================= */
+/* ═══════════ Supabase 설정 — SETUP_GUIDE.txt 3단계에서 붙여넣기 ═══════════ */
+const SUPABASE_URL = "https://riqvhsehmrekdwkqievv.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_rHIC1AkBwfYgGLRb_qABMQ_HZGgCK6E";
+/* ═══════════════════════════════════════════════════════════════════ */
+let sbClient = null, UID = null;
+function flash(msg){
+  const sb=document.getElementById("savebar"); sb.textContent=msg; sb.classList.add("show");
+  clearTimeout(flash._t); flash._t=setTimeout(()=>sb.classList.remove("show"),1100);
+}
+const store = {
+  _t:null,
+  save(){
+    clearTimeout(this._t);
+    this._t=setTimeout(async ()=>{
+      if(!sbClient||!UID){ flash("로그인 필요"); return; }
+      try{
+        const {error}=await sbClient.from("tracker").upsert({user_id:UID, data:DATA, updated_at:new Date().toISOString()});
+        flash(error?"저장 실패 — 새로고침 후 재시도":"☁ 저장됨 ✓");
+        if(error) console.error(error);
+      }catch(e){ flash("저장 실패 — 네트워크 확인"); }
+    },700);
+  }
+};
+let DATA = {};
+function ensureSeeds(){
+if(!Array.isArray(DATA.__events)){
+  DATA.__events = [
+    {id:1, title:"푸른등대 우미희망재단 대면 발표", date:"2026-08-24", endDate:"2026-08-25", type:"발표/면접", link:"", memo:"장학재단 중간활동 발표 (사전 등록 일정 확인)"}
+  ];
+}
+if(!Array.isArray(DATA.__star)){
+  DATA.__star = [
+    {id:1, title:"2026 첨단산업 표준화 경진대회 — 우수상(2위, 국가기술표준원장상)", cat:"대회/수상", period:"2026.05 ~ 2026.07", skills:"표준화, 팀 리더십, 발표, 비색 진단 센서",
+     s:"N-CDs 비색 스마트 진단 패치는 제품 간 성능을 비교·인증할 표준화된 평가 기준이 없는 상황이었음",
+     t:"팀장 겸 발표자로서 범용 성능평가 표준(안) 수립과 본선 발표를 총괄",
+     a:"EN 13726 기반 유체 핸들링, CIELAB(CIE76) 기반 비색 진단, T90 응답속도의 3대 표준 축을 설계하고 미국·중국·EU·일본 등 주요국 바이오 표준 동향을 비교 분석. AI 색보정을 표준 체계에 통합하는 방안 제시",
+     r:"본선 우수상(2위, 국가기술표준원장상) 수상. 기술을 표준·인증 관점에서 구조화하는 역량 확보"},
+    {id:2, title:"F-EM&D 연구실 학부연구생 — 아연-할라이드 전지", cat:"연구", period:"학부연구생 활동", skills:"전기화학 평가, 장비 운용(VMP3·Autolab·CVD·Sputter), 데이터 해석",
+     s:"아연-할라이드 전지 연구에서 재현성 있는 전기화학 평가 데이터 확보가 핵심 과제였음",
+     t:"셀 제작과 전기화학 특성 평가 실험을 담당",
+     a:"VMP3, Autolab 302N, Neware, WBCS3000 등 평가장비와 Sputter, CVD, 글로브박스를 직접 운용하며 평가를 수행 (구체 실험/개선 사례를 추가로 채워보세요)",
+     r:"공정·평가 장비를 다루는 실무 감각과 데이터 기반 판단 경험 확보 — ETCH 엔지니어 업무와 직결되는 역량"},
+    {id:3, title:"Comento 산업체 연계 ETCH 공정 부트캠프 (8주)", cat:"교육/부트캠프", period:"8주 과정", skills:"식각 공정 이해, 공정 파라미터 분석",
+     s:"학부 수업만으로는 실제 식각 공정 엔지니어의 업무 사이클을 구체적으로 알기 어려웠음",
+     t:"현직자 주도 8주 과정에서 ETCH 직무 프로젝트를 수행",
+     a:"(수행한 과제·분석 내용을 구체적으로 채워보세요 — 예: 어떤 공정 이슈를 어떤 데이터로 분석했는지)",
+     r:"ETCH 직무 이해도를 높이고 지원 동기를 구체화. 자소서·면접에서 직무 적합성의 근거로 활용"},
+    {id:4, title:"캡스톤디자인 — N-CDs 당뇨발 진단 패치 (은상 + 공학설계경진대회 1위)", cat:"대회/수상", period:"", skills:"N-CDs 합성, 센서 설계, 문제 정의",
+     s:"당뇨발 환자는 상처 감염을 조기에 인지하기 어려워 중증으로 악화되는 경우가 많음",
+     t:"질소 도핑 탄소점(N-CDs) 기반 비색 진단 패치를 설계·구현",
+     a:"(합성 조건, 평가 방법, 팀 내 역할을 구체적으로 채워보세요)",
+     r:"캡스톤디자인 은상, 공학설계경진대회 1위 수상. 이후 표준화 경진대회 주제로 발전시켜 연속성 있는 스토리 확보"},
+    {id:5, title:"ADSP (데이터분석 준전문가) 취득", cat:"자격증/어학", period:"2026.05", skills:"데이터 분석 기초, 통계",
+     s:"공정 엔지니어에게 공정 데이터를 다루는 분석 역량이 점점 더 요구되는 흐름",
+     t:"학기 중 ADSP 자격 취득을 목표로 설정",
+     a:"최근 5개 회차 기출을 회차별로 분석하고 모의고사를 반복하며 취약 영역을 보완",
+     r:"ADSP 취득 — 공정 데이터 분석 역량을 뒷받침하는 객관적 근거 마련"}
+  ];
+}
+}
+const rec = n => DATA[n] || (DATA[n]={fav:false,status:"미지원",deadline:"",memo:"",url:""});
+
+/* ================= 상태 ================= */
+let filterCat = -1, query = "", sortMode = "default";
+let toggles = { fav:false, active:false, hideDone:false };
+const now = new Date();
+let calDoneOnly = false;
+let calYear = now.getFullYear(), calMonth = now.getMonth();
+
+/* ================= 유틸 ================= */
+const esc = s => String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtDate = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function dday(dateStr){
+  if(!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr+"T00:00:00");
+  return Math.round((d-today)/86400000);
+}
+function ddayBadge(n){
+  if(n===null) return "";
+  if(n<0)  return '<span class="dday past">마감</span>';
+  const cls = n<=3 ? "urgent" : n<=7 ? "soon" : "safe";
+  const txt = n===0 ? "D-DAY" : "D-"+n;
+  return '<span class="dday '+cls+'">'+txt+'</span>';
+}
+const portal = {
+  sr: n => "https://www.saramin.co.kr/zf_user/search/recruit?searchword="+encodeURIComponent(n),
+  jk: n => "https://www.jobkorea.co.kr/Search/?stext="+encodeURIComponent(n),
+  wt: n => "https://www.wanted.co.kr/search?query="+encodeURIComponent(n)
+};
+
+/* ================= 보드 렌더 ================= */
+function catChips(){
+  const box = document.getElementById("catChips");
+  box.innerHTML = '<button class="chip '+(filterCat===-1?"on":"")+'" data-cat="-1">전체</button>' +
+    CATS.map((c,i)=>'<button class="chip '+(filterCat===i?"on":"")+'" data-cat="'+i+'">'+c+'</button>').join("");
+}
+function visibleList(){
+  let list = COMPANIES.filter(([n,e,c])=>{
+    if(filterCat!==-1 && c!==filterCat) return false;
+    if(query && !(n+e).toLowerCase().includes(query)) return false;
+    const r = rec(n);
+    if(toggles.fav && !r.fav) return false;
+    if(toggles.active && !ACTIVE_SET.has(r.status)) return false;
+    if(toggles.hideDone && DONE_SET.has(r.status)) return false;
+    return true;
+  });
+  const key = a => a[0];
+  if(sortMode==="name") list.sort((a,b)=>key(a).localeCompare(key(b),"ko"));
+  else if(sortMode==="deadline"){
+    list.sort((a,b)=>{
+      const da=dday(rec(key(a)).deadline), db=dday(rec(key(b)).deadline);
+      const va=(da===null||da<0)?9999:da, vb=(db===null||db<0)?9999:db;
+      return va-vb;
+    });
+  } else {
+    list.sort((a,b)=>{
+      const ra=rec(key(a)), rb=rec(key(b));
+      if(ra.fav!==rb.fav) return ra.fav?-1:1;
+      return 0;
+    });
+  }
+  return list;
+}
+function renderBoard(){
+  catChips();
+  document.querySelectorAll("[data-tg]").forEach(b=>b.classList.toggle("on",toggles[b.dataset.tg]));
+  const grid = document.getElementById("grid");
+  const list = visibleList();
+  if(!list.length){ grid.innerHTML = '<div class="empty">조건에 맞는 기업이 없어요. 필터를 풀어보세요.</div>'; }
+  else grid.innerHTML = list.map(([n,e,c])=>{
+    const r = rec(n);
+    const url = r.url || COMPANIES.find(x=>x[0]===n)[3];
+    const dd = dday(r.deadline);
+    return '<div class="card '+(r.fav?"fav":"")+' '+(DONE_SET.has(r.status)?"done":"")+'" data-n="'+esc(n)+'">'
+      +'<div class="c-top"><div class="c-name">'+esc(n)+'<small>'+esc(e)+'</small></div>'
+      +'<button class="star '+(r.fav?"on":"")+'" title="즐겨찾기">★</button></div>'
+      +'<div style="display:flex; align-items:center; flex-wrap:wrap; gap:2px;"><span class="cat c'+c+'">'+CATS[c]+'</span>'
+      +(jobsFor(n).length?'<span class="jobbadge" title="최신 공고 탭에서 확인">공고 '+jobsFor(n).length+'건</span>':"")
+      +(OWN_PORTAL.has(n)?(
+          (window.JOBS && Array.isArray(window.JOBS.items) && !jobsFor(n).length)
+          ?'<span class="ownbadge alert" title="이번 자동수집에서 0건이었어요. 이 기업은 자사/그룹 채용사이트 위주라 사람인에 공고가 안 올라올 수 있으니 공식 채용 링크를 직접 확인하세요.">⚠ 수집 0건 · 공식페이지 확인</span>'
+          :'<span class="ownbadge" title="자사/그룹/글로벌 채용사이트 위주 기업이라 자동수집에 누락될 수 있어요. 공식 채용 링크 병행 확인을 권장해요.">자사채용 위주</span>'
+        ):"")+'</div>'
+      +'<div class="c-ctrl"><select class="statusSel">'+STATUSES.map(s=>'<option '+(s===r.status?"selected":"")+'>'+s+'</option>').join("")+'</select>'
+      +'<input type="date" class="dl" value="'+r.deadline+'" title="지원 마감일">'+ddayBadge(dd)+'</div>'
+      +'<div class="links">'
+      +(url?'<a class="l-off" href="'+esc(url)+'" target="_blank" rel="noopener">채용공고 ↗</a>':"")
+      +'<a class="l-sr" href="'+portal.sr(n)+'" target="_blank" rel="noopener">사람인</a>'
+      +'<a class="l-jk" href="'+portal.jk(n)+'" target="_blank" rel="noopener">잡코리아</a>'
+      +'<a class="l-wt" href="'+portal.wt(n)+'" target="_blank" rel="noopener">원티드</a>'
+      +'<button class="l-edit">링크 수정</button></div>'
+      +'<textarea class="memo" rows="1" placeholder="메모 — 공고명, 자소서 문항, 우대사항 등">'+esc(r.memo)+'</textarea>'
+      +'</div>';
+  }).join("");
+  renderStats(); renderTicker();
+}
+function renderStats(){
+  let fav=0, active=0, soon=0;
+  COMPANIES.forEach(([n])=>{
+    const r = DATA[n]; if(!r) return;
+    if(r.fav) fav++;
+    if(ACTIVE_SET.has(r.status)) active++;
+    const d = dday(r.deadline);
+    if(d!==null && d>=0 && d<=7) soon++;
+  });
+  DATA.__events.forEach(ev=>{ const d=dday(ev.date); if(d!==null&&d>=0&&d<=7) soon++; });
+  stTotal.textContent = COMPANIES.length;
+  stFav.textContent = fav; stActive.textContent = active; stSoon.textContent = soon;
+}
+function renderTicker(){
+  const items = [];
+  COMPANIES.forEach(([n])=>{ const d=dday(DATA[n]?.deadline||""); if(d!==null&&d>=0&&d<=14) items.push({kind:"dl",label:n+" 마감",d,goto:n,color:DL_COLOR}); });
+  DATA.__events.forEach(ev=>{ const d=dday(ev.date); if(d!==null&&d>=0&&d<=14) items.push({kind:"ev",label:ev.title,d,ev,color:ETYPES[ev.type]||"#5B6B8C"}); });
+  items.sort((a,b)=>a.d-b.d);
+  document.getElementById("ticker").innerHTML = items.map((x,i)=>
+    '<div class="tick" data-ti="'+i+'"><span class="dd '+(x.d<=3?"urgent":"")+'">'+(x.d===0?"D-DAY":"D-"+x.d)+'</span><span class="dot" style="background:'+x.color+'"></span>'+esc(x.label)+'</div>'
+  ).join("");
+  document.getElementById("ticker")._items = items;
+}
+
+/* ================= 달력 렌더 ================= */
+function eventMap(){
+  const map = {};
+  const push=(k,it)=>{ (map[k]=map[k]||[]).push(it); };
+  COMPANIES.forEach(([n])=>{ const d=DATA[n]?.deadline; if(!d) return; if(calDoneOnly && !APPLIED_SET.has(DATA[n]?.status)) return; push(d,{kind:"dl",label:n+" 마감",name:n,color:DL_COLOR}); });
+  DATA.__events.forEach(ev=>{
+    if(calDoneOnly && !ev.done) return;
+    const s=new Date(ev.date+"T00:00:00");
+    const e= ev.endDate ? new Date(ev.endDate+"T00:00:00") : s;
+    for(let d=new Date(s), i=0; d<=e && i<62; d.setDate(d.getDate()+1), i++){
+      push(fmtDate(d), {kind:"ev",label:(ev.done?"✓ ":"")+ev.title,ev,color:ETYPES[ev.type]||"#5B6B8C"});
+    }
+  });
+  return map;
+}
+function renderCal(){
+  document.getElementById("calTitle").textContent = calYear+"년 "+(calMonth+1)+"월";
+  const map = eventMap();
+  const firstDow = new Date(calYear,calMonth,1).getDay();
+  const dim = new Date(calYear,calMonth+1,0).getDate();
+  const prevDim = new Date(calYear,calMonth,0).getDate();
+  const todayStr = fmtDate(new Date());
+  let cells = "";
+  const total = Math.ceil((firstDow+dim)/7)*7;
+  for(let i=0;i<total;i++){
+    const dayNum = i-firstDow+1;
+    let y=calYear,m=calMonth,dn=dayNum,other=false;
+    if(dayNum<1){ other=true; m=calMonth-1; dn=prevDim+dayNum; if(m<0){m=11;y--;} }
+    else if(dayNum>dim){ other=true; m=calMonth+1; dn=dayNum-dim; if(m>11){m=0;y++;} }
+    const key = y+"-"+String(m+1).padStart(2,"0")+"-"+String(dn).padStart(2,"0");
+    const items = map[key]||[];
+    const shown = items.slice(0,3);
+    const extra = items.length-shown.length;
+    cells += '<div class="cell'+(other?" other":"")+(key===todayStr?" today":"")+(i%7===0?" sun":"")+'" data-date="'+key+'">'
+      +'<span class="dnum">'+dn+'</span>'
+      +shown.map((it,idx)=>'<div class="evchip" style="--c:'+it.color+'" data-idx="'+idx+'">'+esc(it.label)+'</div>').join("")
+      +(extra>0?'<div class="evchip more">+'+extra+'개 더보기</div>':"")
+      +'</div>';
+  }
+  document.getElementById("calGrid").innerHTML = cells;
+  document.getElementById("calGrid")._map = map;
+  document.getElementById("legend").innerHTML =
+    '<span><i style="background:'+DL_COLOR+'"></i>채용 마감 (자동)</span>'+
+    Object.entries(ETYPES).map(([t,c])=>'<span><i style="background:'+c+'"></i>'+t+'</span>').join("");
+}
+
+/* ================= 모달 ================= */
+const overlay = document.getElementById("overlay"), modalBox = document.getElementById("modalBox");
+function openModal(html){ modalBox.innerHTML = html; overlay.classList.add("show"); }
+function closeModal(){ overlay.classList.remove("show"); }
+overlay.addEventListener("click",e=>{ if(e.target===overlay) closeModal(); });
+function showItem(it){
+  if(it.kind==="dl"){
+    openModal('<h3>'+esc(it.label)+'</h3><div class="mline">기업 카드의 마감일에서 자동 표시된 일정이에요.</div>'
+      +'<div class="mbtns"><button class="btn primary" id="mGoBoard">기업 카드로 이동</button><button class="btn" id="mClose">닫기</button></div>');
+    document.getElementById("mGoBoard").onclick=()=>{ closeModal(); gotoCompany(it.name); };
+  } else {
+    const ev = it.ev;
+    openModal('<h3>'+esc(ev.title)+'</h3>'
+      +'<div class="mline">'+ev.type+' · '+ev.date+(ev.endDate?' ~ '+ev.endDate:'')+'</div>'
+      +(ev.memo?'<div class="mmemo">'+esc(ev.memo)+'</div>':'')
+      +'<div class="mbtns">'
+      +'<button class="btn '+(ev.done?"":"primary")+'" id="mDone">'+(ev.done?"✓ 신청 완료됨 (해제)":"☐ 신청 완료로 표시")+'</button>'
+      +(ev.link?'<a class="btn" style="text-decoration:none" href="'+esc(ev.link)+'" target="_blank" rel="noopener">링크 열기 ↗</a>':'')
+      +'<button class="btn" id="mDel" style="color:var(--warn); border-color:var(--warn)">삭제</button>'
+      +'<button class="btn" id="mClose">닫기</button></div>');
+    document.getElementById("mDone").onclick=()=>{
+      ev.done=!ev.done; store.save(DATA); closeModal(); renderCal(); renderStats(); renderTicker();
+    };
+    document.getElementById("mDel").onclick=()=>{
+      if(confirm('"'+ev.title+'" 일정을 삭제할까요?')){
+        DATA.__events = DATA.__events.filter(x=>x.id!==ev.id);
+        store.save(DATA); closeModal(); renderCal(); renderStats(); renderTicker();
+      }
+    };
+  }
+  const c=document.getElementById("mClose"); if(c) c.onclick=closeModal;
+}
+function showDayList(key, items){
+  openModal('<h3>'+key+'</h3><div class="mlist">'
+    +items.map((it,i)=>'<div class="evchip" style="--c:'+it.color+'" data-i="'+i+'">'+esc(it.label)+'</div>').join("")
+    +'</div><div class="mbtns"><button class="btn" id="mClose">닫기</button></div>');
+  modalBox.querySelectorAll(".mlist .evchip").forEach(el=>el.onclick=()=>showItem(items[+el.dataset.i]));
+  document.getElementById("mClose").onclick=closeModal;
+}
+function gotoCompany(n){
+  switchTab("board");
+  query=""; document.getElementById("q").value="";
+  filterCat=-1; toggles={fav:false,active:false,hideDone:false}; renderBoard();
+  const card = [...document.querySelectorAll(".card")].find(c=>c.dataset.n===n);
+  if(card){ card.scrollIntoView({behavior:"smooth",block:"center"}); card.style.boxShadow="0 0 0 3px var(--teal)"; setTimeout(()=>card.style.boxShadow="",1400); }
+}
+
+/* ================= 탭 ================= */
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+  document.getElementById("boardView").style.display = t==="board"?"block":"none";
+  document.getElementById("calView").style.display = t==="cal"?"flex":"none";
+  document.getElementById("jobsView").style.display = t==="jobs"?"flex":"none";
+  document.getElementById("actView").style.display = t==="act"?"flex":"none";
+  document.getElementById("starView").style.display = t==="star"?"flex":"none";
+  if(t==="cal") renderCal();
+  if(t==="jobs") renderJobs();
+  if(t==="act") renderAct();
+  if(t==="star") renderStar();
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+
+/* ================= 이벤트: 보드 ================= */
+document.getElementById("catChips").addEventListener("click",e=>{
+  const b=e.target.closest("[data-cat]"); if(!b) return;
+  filterCat = +b.dataset.cat; renderBoard();
+});
+document.getElementById("sizeChips").addEventListener("click",e=>{
+  const b=e.target.closest("[data-size]"); if(!b) return;
+  filterSize = b.dataset.size; renderBoard();
+});
+document.querySelectorAll("[data-tg]").forEach(b=>b.addEventListener("click",()=>{
+  toggles[b.dataset.tg]=!toggles[b.dataset.tg]; renderBoard();
+}));
+document.getElementById("q").addEventListener("input",e=>{ query=e.target.value.trim().toLowerCase(); renderBoard(); });
+document.getElementById("sort").addEventListener("change",e=>{ sortMode=e.target.value; renderBoard(); });
+
+document.getElementById("grid").addEventListener("click",e=>{
+  const card = e.target.closest(".card"); if(!card) return;
+  const n = card.dataset.n, r = rec(n);
+  if(e.target.closest(".star")){ r.fav=!r.fav; store.save(DATA); renderBoard(); }
+  else if(e.target.closest(".l-edit")){
+    const cur = r.url || COMPANIES.find(x=>x[0]===n)[3];
+    const v = prompt(n+" 공식 채용 페이지 주소를 입력하세요 (비우면 기본값)", cur||"https://");
+    if(v!==null){ r.url = v.trim()==="https://"?"":v.trim(); store.save(DATA); renderBoard(); }
+  }
+});
+document.getElementById("grid").addEventListener("change",e=>{
+  const card = e.target.closest(".card"); if(!card) return;
+  const r = rec(card.dataset.n);
+  if(e.target.classList.contains("statusSel")){ r.status=e.target.value; store.save(DATA); renderBoard(); }
+  if(e.target.classList.contains("dl")){ r.deadline=e.target.value; store.save(DATA); renderBoard(); }
+});
+let memoTimer;
+document.getElementById("grid").addEventListener("input",e=>{
+  if(!e.target.classList.contains("memo")) return;
+  const n = e.target.closest(".card").dataset.n;
+  clearTimeout(memoTimer);
+  memoTimer = setTimeout(()=>{ rec(n).memo = e.target.value; store.save(DATA); renderStats(); },500);
+});
+document.getElementById("ticker").addEventListener("click",e=>{
+  const t = e.target.closest("[data-ti]"); if(!t) return;
+  const it = document.getElementById("ticker")._items[+t.dataset.ti];
+  if(it.kind==="dl") gotoCompany(it.goto);
+  else{
+    const d=new Date(it.ev.date+"T00:00:00"); calYear=d.getFullYear(); calMonth=d.getMonth();
+    switchTab("cal"); showItem({kind:"ev",ev:it.ev,label:it.ev.title,color:ETYPES[it.ev.type]});
+  }
+});
+
+/* ================= 이벤트: 달력 ================= */
+document.getElementById("calDoneFilter").addEventListener("click",e=>{
+  calDoneOnly=!calDoneOnly;
+  e.target.classList.toggle("on-teal", calDoneOnly);
+  e.target.textContent = calDoneOnly ? "☑ 신청한 것만 (해제)" : "☑ 신청한 것만";
+  renderCal();
+});
+document.getElementById("calPrev").addEventListener("click",()=>{ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); });
+document.getElementById("calNext").addEventListener("click",()=>{ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); });
+document.getElementById("calToday").addEventListener("click",()=>{ const t=new Date(); calYear=t.getFullYear(); calMonth=t.getMonth(); renderCal(); });
+document.getElementById("calGrid").addEventListener("click",e=>{
+  const cell = e.target.closest(".cell"); if(!cell) return;
+  const key = cell.dataset.date;
+  const items = document.getElementById("calGrid")._map[key]||[];
+  const chip = e.target.closest(".evchip");
+  if(chip){
+    if(chip.classList.contains("more")) showDayList(key, items);
+    else showItem(items[+chip.dataset.idx]);
+  } else {
+    document.getElementById("evDate").value = key;
+    document.getElementById("evTitle").focus();
+  }
+});
+document.getElementById("addEvBtn").addEventListener("click",()=>{
+  const title = document.getElementById("evTitle").value.trim();
+  const date = document.getElementById("evDate").value;
+  if(!title || !date){ alert("일정 이름과 시작일을 입력해주세요."); return; }
+  const end = document.getElementById("evEnd").value;
+  if(end && end<date){ alert("종료일이 시작일보다 빠를 수 없어요."); return; }
+  DATA.__events.push({
+    id: Date.now(),
+    title, date,
+    endDate: end||"",
+    type: document.getElementById("evType").value,
+    link: document.getElementById("evLink").value.trim(),
+    memo: document.getElementById("evMemo").value.trim()
+  });
+  store.save(DATA);
+  ["evTitle","evEnd","evLink","evMemo"].forEach(id=>document.getElementById(id).value="");
+  const d=new Date(date+"T00:00:00"); calYear=d.getFullYear(); calMonth=d.getMonth();
+  renderCal(); renderStats(); renderTicker();
+});
+
+/* ================= 백업 ================= */
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const blob = new Blob([JSON.stringify(DATA,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "채용트래커_백업_"+new Date().toISOString().slice(0,10)+".json";
+  a.click(); URL.revokeObjectURL(a.href);
+});
+document.getElementById("importBtn").addEventListener("click",()=>importFile.click());
+document.getElementById("importFile").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{ DATA = JSON.parse(rd.result); if(!Array.isArray(DATA.__events)) DATA.__events=[]; if(!Array.isArray(DATA.__star)) DATA.__star=[]; store.save(DATA); renderBoard(); renderCal(); alert("백업을 불러왔어요."); }catch(err){ alert("파일을 읽을 수 없어요. 백업 JSON 파일이 맞는지 확인해주세요."); } };
+  rd.readAsText(f); e.target.value="";
+});
+
+/* ================= 최신 공고 ================= */
+function jobsFor(n){
+  if(!window.JOBS || !Array.isArray(window.JOBS.items)) return [];
+  return window.JOBS.items.filter(it=>it.tracker===n);
+}
+let jQuery2="", jCat=-1, jSort="exp";
+document.getElementById("jcat").innerHTML += CATS.map((c,i)=>'<option value="'+i+'">'+c+'</option>').join("");
+function renderJobs(){
+  const wrap = document.getElementById("jobsList");
+  const upd = document.getElementById("jobsUpdated");
+  if(!window.JOBS || !Array.isArray(window.JOBS.items)){
+    upd.textContent = "";
+    wrap.innerHTML = '<div class="setup"><h3>공고 자동 수집 설정 (최초 1회)</h3>'
+      +'<ol>'
+      +'<li><a href="https://oapi.saramin.co.kr" target="_blank" rel="noopener">사람인 채용정보 API (oapi.saramin.co.kr)</a>에서 <b>이용신청</b> → 승인 후 <b>access-key</b> 발급 (무료)</li>'
+      +'<li>이 HTML과 같은 폴더에 <code>update_jobs.py</code>, <code>공고_업데이트.bat</code> 파일을 함께 두기</li>'
+      +'<li>같은 폴더에 <code>api_key.txt</code> 파일을 만들어 발급받은 키 붙여넣기 (없으면 실행 시 입력창이 떠요)</li>'
+      +'<li>Windows: <code>공고_업데이트.bat</code> 더블클릭 (<a href="https://www.python.org/downloads/" target="_blank" rel="noopener">Python</a> 설치 필요) · Mac: 터미널에서 <code>python3 update_jobs.py</code></li>'
+      +'<li>완료되면 <code>jobs.js</code>가 생성돼요 → 이 페이지를 <b>새로고침</b>하면 공고가 표시됩니다</li>'
+      +'</ol>'
+      +'<div style="margin-top:8px; font-size:12.5px; color:var(--sub);">이후에는 공고를 갱신하고 싶을 때마다 bat 파일만 다시 더블클릭하면 돼요. API는 1일 500회 호출 한도라 하루 여러 번 갱신해도 넉넉합니다.</div></div>';
+    return;
+  }
+  const items = window.JOBS.items.filter(it=>{
+    if(jCat!==-1 && it.cat!==jCat) return false;
+    if(jQuery2 && !(it.tracker+it.company+it.title).toLowerCase().includes(jQuery2)) return false;
+    return true;
+  });
+  items.sort((a,b)=> jSort==="new"
+    ? (b.posted||"").localeCompare(a.posted||"")
+    : (a.expiration||"9999").localeCompare(b.expiration||"9999"));
+  upd.textContent = "마지막 업데이트: "+window.JOBS.generatedAt+" · 총 "+window.JOBS.items.length+"건 · 출처: 사람인 채용정보 API";
+  if(!items.length){ wrap.innerHTML = '<div class="empty">조건에 맞는 공고가 없어요.</div>'; return; }
+  wrap.innerHTML = items.map((it,i)=>{
+    const dd = it.expiration ? dday(it.expiration) : null;
+    return '<div class="jrow">'
+      +'<div class="jmain"><span class="jco c'+it.cat+'">'+esc(it.tracker)+'</span>'
+      +(it.bbs?'<span class="gcbadge">공채속보</span>':"")
+      +'<a class="jtitle" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+' ↗</a>'
+      +'<div class="jsub">'+esc(it.company)+(it.location?' · '+esc(it.location):'')+(it.jobType?' · '+esc(it.jobType):'')+(it.career?' · '+esc(it.career):'')+'</div></div>'
+      +'<div class="jside">'
+      +(it.expiration?'<span class="jexp">~'+it.expiration+'</span>'+ddayBadge(dd):'<span class="jexp">'+esc(it.closeType||"상시")+'</span>')
+      +(it.expiration?'<button class="btn small" data-apply="'+i+'">마감일 카드에 적용</button>':'')
+      +'</div></div>';
+  }).join("");
+  wrap._items = items;
+}
+document.getElementById("jobsReload").addEventListener("click",()=>{
+  // jobs.js를 캐시 없이 다시 로드 → 최신 자동수집 결과 반영
+  location.reload();
+});
+document.getElementById("jq").addEventListener("input",e=>{ jQuery2=e.target.value.trim().toLowerCase(); renderJobs(); });
+document.getElementById("jcat").addEventListener("change",e=>{ jCat=+e.target.value; renderJobs(); });
+document.getElementById("jsort").addEventListener("change",e=>{ jSort=e.target.value; renderJobs(); });
+document.getElementById("jobsList").addEventListener("click",e=>{
+  const b = e.target.closest("[data-apply]"); if(!b) return;
+  const it = document.getElementById("jobsList")._items[+b.dataset.apply];
+  const r = rec(it.tracker);
+  r.deadline = it.expiration;
+  if(r.status==="미지원") r.status="관심";
+  store.save(DATA); renderBoard();
+  b.textContent = "적용됨 ✓"; b.disabled = true;
+});
+
+/* ================= 교육·대외활동 ================= */
+// 조사 기준일: 2026-08-03 (Claude 웹 조사) — 최신 정보는 링크에서 재확인
+const ACT_HOT_DATE = "2026.08.03";
+const ACT_HOT = [
+ {name:"🔥 SK하이닉스 하반기 기술사무직 신입 채용", why:"<b>접수 8/20(목)~8/26(수)</b>. 설계·소자·R&D공정·양산기술 모집 — ETCH는 R&D공정/양산기술 직무로 지원. 학력·연령 제한 폐지, <b>자소서가 AI 활용 역량 + 직무 전문성 중심의 새 서식으로 변경</b>되니 기존 자소서 재활용 전에 8/20 정식 공고 확인 필수!", url:"https://www.skcareers.com", ev:{title:"SK하이닉스 하반기 신입 접수", date:"2026-08-20", endDate:"2026-08-26", type:"기타", memo:"R&D공정/양산기술 직무. 새 자소서 서식(AI 활용 역량) 확인"}},
+ {name:"⏰ SK하이닉스 채용설명회 'Talent hy-way Recruiting' 신청", why:"<b>신청 마감 8/4(화) 17:00 — 임박!</b> 서울 8/13·14, 대구 8/18, 청주 8/19, 광주 8/24. 직무 소개 + 새 지원서 작성 기준 안내 — R&D공정 vs 양산기술 차이를 현직자에게 직접 물을 기회.", url:"https://2026-skhynix-recruit.co.kr", ev:{title:"SK하이닉스 채용설명회 신청 마감", date:"2026-08-04", endDate:"", type:"발표/면접", memo:"17:00 마감. 서울 8/13-14 회차 신청"}},
+ {name:"📅 삼성전자 DS 하반기 3급 공채 (예상 일정)", why:"과거 패턴 기준 <b>서류 접수 9/1~9/8, GSAT 10월 말 예상</b> (확정 아님 — 8월 말 삼성커리어스 공고 확인). 접수 마감 시점에 유효한 어학 성적 필요 — OPIc IH 유효기간 점검해두세요.", url:"https://www.samsungcareers.com", ev:{title:"삼성 DS 하반기 공채 접수 (예상)", date:"2026-09-01", endDate:"2026-09-08", type:"기타", memo:"예상 일정 — 8월 말 공식 공고로 확정할 것. 어학 유효기간 확인"}},
+];
+const ACT_GROUPS = [
+{ title:"① 반도체 공정실습 (Fab 실습)", desc:"ETCH 공정 지원자에게 가장 직접적인 스펙. 자소서·면접에서 '직접 장비를 만져본 경험'으로 쓸 수 있어요. 인기 프로그램은 접수 오픈 당일 마감되니 모집공고 확인 즉시 달력에 등록하세요.", evType:"공정실습", items:[
+  {name:"SPTA 반도체공정기술교육원 (용인)", url:"https://www.sptakorea.com", why:"패터닝·박막형성·<b>구조형성(식각) 공정실습</b>을 매월 온라인 예약으로 모집. 식각 실습이 있는 몇 안 되는 곳이라 ETCH 타겟이면 최우선 추천.", tag:"강력 추천"},
+  {name:"서울대 반도체공동연구소 (ISRC)", url:"https://isrc.snu.ac.kr", why:"가장 알려진 학부생 공정실습. 8대 공정을 실제 팹에서 경험. 경쟁이 치열하니 모집 알림을 수시로 확인.", tag:"인기 高"},
+  {name:"나노종합기술원 (NNFC, 대전)", url:"https://www.nnfc.re.kr", why:"국가 나노팹. 공정·계측 장비 실습 교육 상시 운영. F-EM&D 랩 장비 경험(Sputter, CVD)과 연결해 어필 가능."},
+  {name:"한국나노기술원 (KANC, 수원)", url:"https://www.kanc.re.kr", why:"화합물 반도체·공정 교육. 수도권 접근성이 좋고 단기 과정이 많아 학기 중에도 수강 가능."},
+  {name:"한국폴리텍대학 반도체융합캠퍼스 (안성)", url:"https://www.kopo.ac.kr", why:"클린룸 실습 인프라 보유. 방학 중 단기 실습 과정이 열리는지 학교 공지를 확인."},
+]},
+{ title:"② 무료 교육 · 아카데미", desc:"수료증이 남는 정부·협회 주관 무료 교육. 이수 자체보다 '어떤 과목을 왜 들었는지'를 직무 스토리로 연결하는 게 중요해요.", evType:"교육/부트캠프", items:[
+  {name:"한국반도체아카데미 (KSA)", url:"https://academy.ksia.or.kr", why:"반도체산업협회 운영, 대학생·취준생 무료. 공정 과목 다수 + <b>램리서치 등 장비사 채용 이벤트</b>도 공지에 올라와서 채용정보 소스로도 유용.", tag:"강력 추천"},
+  {name:"IDEC 반도체설계교육센터", url:"https://www.idec.or.kr", why:"KAIST 운영. 설계 중심이지만 소자·공정 기초 강좌도 있어 지식 보강용으로 활용."},
+  {name:"팹리스 교육 아카데미 (KFIA)", url:"http://edu-kfia.or.kr", why:"설계·검증 위주 무료 교육 + 일경험 프로그램. 팹리스 방향도 열어두고 싶다면 참고."},
+  {name:"한국반도체교육원 (강원)", url:"https://ksti.co.kr", why:"지자체 설립 반도체 교육기관. Fab 건축·장비 등 특색 있는 과정 운영."},
+]},
+{ title:"③ 인턴 · 일경험", desc:"채용전환형이 아니어도 '현장 일경험'은 서류 통과율을 크게 올려요. Hy-Po·모비스 경험이 있으니 다음 사이클 전 짧은 일경험으로 공백을 메우는 전략도 좋아요.", evType:"기타", items:[
+  {name:"고용24 미래내일 일경험", url:"https://www.work24.go.kr", why:"고용부 청년 일경험 사업. 반도체 소부장 기업 인턴형·프로젝트형이 수시 모집돼요. '반도체'로 검색."},
+  {name:"SK하이닉스 청년 Hy-Five", url:"https://www.skhynix.com", why:"SK하이닉스가 주관하는 협력사(소부장) 청년 인턴 프로그램. 장비·소재사 현장 경험 + 하이닉스 생태계 이해를 동시에. 모집 시기는 공지 확인 필요.", tag:"ETCH 연관"},
+  {name:"링커리어 인턴 검색", url:"https://linkareer.com", why:"대외활동·인턴 공고 최대 플랫폼. '반도체' 알림 설정해두면 사람인에 없는 인턴 공고를 보완."},
+]},
+{ title:"④ 공모전 · 대외활동 탐색", desc:"표준화 경진대회 수상(KATS 원장상) 경험처럼, 수상 이력은 자소서의 강력한 소재. 4학년 2학기엔 부담 적은 단기 공모전 위주로.", evType:"기타", items:[
+  {name:"캐치 (CATCH)", url:"https://www.catch.co.kr", why:"기업 분석 + 공모전·채용설명회 정보. 관심기업 팔로우하면 채용설명회 알림을 받아요."},
+  {name:"위비티 (Wevity)", url:"https://www.wevity.com", why:"공모전 모음 사이트. '과학/공학' 카테고리에서 반도체·소재 관련 공모전 탐색."},
+  {name:"씽굿 (Thinkcontest)", url:"https://www.thinkcontest.com", why:"공모전·논문대회 아카이브. 학술 논문형 대회는 랩 연구(아연-할라이드 전지) 경험과 연결 가능."},
+]},
+];
+let actRendered = false;
+function renderAct(){
+  if(actRendered) return;
+  actRendered = true;
+  const box = document.getElementById("actView");
+  box.innerHTML = '<div class="act-group"><h2>🔔 지금 확인 필요 <span style="font-size:12px; color:var(--sub); font-weight:600">('+ACT_HOT_DATE+' 조사 기준 — 최신 정보는 링크에서 재확인)</span></h2><div class="act-grid">'
+    +ACT_HOT.map((it,i)=>'<div class="act-card" style="border-color:var(--amber)">'
+      +'<h4>'+it.name+'</h4><div class="why">'+it.why+'</div>'
+      +'<div class="act-btns"><a href="'+it.url+'" target="_blank" rel="noopener">사이트 열기 ↗</a>'
+      +'<button class="btn small" data-hotadd="'+i+'">📌 달력에 바로 등록</button></div>'
+      +'</div>').join("")
+    +'</div></div>'
+    +ACT_GROUPS.map((g,gi)=>'<div class="act-group"><h2>'+g.title+'</h2><div class="gdesc">'+g.desc+'</div><div class="act-grid">'
+    +g.items.map((it,ii)=>'<div class="act-card">'
+      +(it.tag?'<span class="act-tag" style="background:var(--teal-l); color:var(--teal)">'+it.tag+'</span>':'')
+      +'<h4>'+it.name+'</h4><div class="why">'+it.why+'</div>'
+      +'<div class="act-btns"><a href="'+it.url+'" target="_blank" rel="noopener">사이트 열기 ↗</a>'
+      +'<button class="btn small" data-actadd="'+gi+'-'+ii+'">모집일정 달력에 등록</button></div>'
+      +'</div>').join("")
+    +'</div></div>').join("")
+    +'<div class="res-note" style="background:var(--card); border:1.5px dashed var(--line); border-radius:12px; padding:14px 16px;">💡 활용 순서: 사이트에서 모집공고 확인 → "모집일정 달력에 등록" 클릭 → 달력 폼에 이름·유형이 자동 입력되니 접수 마감일만 넣으면 D-day 관리 시작. 프로그램 모집은 수시로 열리니 사이트 확인을 주 1회 루틴으로 잡는 걸 추천해요.</div>';
+  box.addEventListener("click",e=>{
+    const h = e.target.closest("[data-hotadd]");
+    if(h){
+      const it = ACT_HOT[+h.dataset.hotadd];
+      if(DATA.__events.some(ev=>ev.title===it.ev.title)){ h.textContent="이미 등록됨 ✓"; return; }
+      DATA.__events.push({id:Date.now(), title:it.ev.title, date:it.ev.date, endDate:it.ev.endDate||"", type:it.ev.type, link:it.url, memo:it.ev.memo||""});
+      store.save(DATA); renderStats(); renderTicker();
+      h.textContent="등록됨 ✓"; h.disabled=true;
+      return;
+    }
+    const b = e.target.closest("[data-actadd]"); if(!b) return;
+    const [gi,ii] = b.dataset.actadd.split("-").map(Number);
+    const g = ACT_GROUPS[gi], it = g.items[ii];
+    switchTab("cal");
+    document.getElementById("evTitle").value = it.name+" 접수 마감";
+    document.getElementById("evType").value = g.evType;
+    document.getElementById("evLink").value = it.url;
+    document.getElementById("evDate").focus();
+    document.getElementById("evDate").scrollIntoView({behavior:"smooth",block:"center"});
+  });
+}
+
+/* ================= 활동기록 STAR ================= */
+const SCATS = ["연구","대회/수상","교육/부트캠프","인턴/직무경험","자격증/어학","대외활동","기타"];
+document.getElementById("scat").innerHTML += SCATS.map(c=>'<option>'+c+'</option>').join("");
+let sFilter = "전체";
+const SGUIDE = {
+  s:"S — 어떤 상황/문제가 있었나요? (배경, 왜 중요한 문제였는지)",
+  t:"T — 그 안에서 내 역할/목표는 무엇이었나요?",
+  a:"A — 구체적으로 무엇을 어떻게 했나요? (숫자·도구·판단 과정)",
+  r:"R — 결과는? (수상·수치·배운 점, 지원 직무와의 연결)"
+};
+function starRec(id){ return DATA.__star.find(x=>x.id===id); }
+const SCAT_COLOR = {"연구":"#1B3A6B","대회/수상":"#0E9594","교육/부트캠프":"#3A5AA0","인턴/직무경험":"#C97F17","자격증/어학":"#7C4DBE","대외활동":"#2E8B57","기타":"#5B6B8C"};
+let sOpen = new Set();
+function renderStar(){
+  const grid = document.getElementById("starGrid");
+  const list = DATA.__star.filter(x=> sFilter==="전체" || x.cat===sFilter);
+  if(!list.length){ grid.innerHTML = '<div class="empty">기록이 없어요. "+ 새 활동 추가"로 시작해보세요.</div>'; return; }
+  grid.innerHTML = list.map(x=>{
+    const open = sOpen.has(x.id);
+    return '<div class="scard'+(open?" open":"")+'" data-sid="'+x.id+'">'
+    +'<button class="shead" type="button">'
+      +'<span class="scatchip" style="--sc:'+(SCAT_COLOR[x.cat]||"#5B6B8C")+'">'+esc(x.cat)+'</span>'
+      +'<span class="shead-title'+(x.title?"":" empty")+'">'+(x.title?esc(x.title):"제목 없음 — 클릭해서 작성")+'</span>'
+      +'<span class="shead-period">'+esc(x.period||"")+'</span>'
+      +'<span class="scaret">▶</span>'
+    +'</button>'
+    +'<div class="sbody">'
+    +'<div class="srow"><input type="text" class="stitle" data-f="title" value="'+esc(x.title)+'" placeholder="활동명 (예: ○○ 인턴, △△ 공모전)">'
+    +'<select data-f="cat">'+SCATS.map(c=>'<option '+(c===x.cat?"selected":"")+'>'+c+'</option>').join("")+'</select>'
+    +'<button class="sdel" type="button" title="삭제">✕</button></div>'
+    +'<div class="srow"><input type="text" class="speriod" data-f="period" value="'+esc(x.period)+'" placeholder="기간 (2026.03 ~ 2026.07)">'
+    +'<input type="text" class="sskills" data-f="skills" value="'+esc(x.skills)+'" placeholder="관련 역량 키워드 (예: ETCH, 데이터 분석)"></div>'
+    +["s","t","a","r"].map(f=>'<div class="sfield"><span class="slabel sl-'+f+'">'+f.toUpperCase()+'</span>'
+      +'<textarea data-f="'+f+'" rows="2" placeholder="'+SGUIDE[f]+'">'+esc(x[f]||"")+'</textarea></div>').join("")
+    +'<button class="btn small scopy" type="button">📋 자소서용 텍스트 복사</button>'
+    +'</div></div>';
+  }).join("");
+}
+document.getElementById("scat").addEventListener("change",e=>{ sFilter=e.target.value; renderStar(); });
+document.getElementById("addStarBtn").addEventListener("click",()=>{
+  const id = Date.now();
+  DATA.__star.unshift({id, title:"", cat:sFilter==="전체"?"기타":sFilter, period:"", skills:"", s:"", t:"", a:"", r:""});
+  sOpen.add(id);
+  store.save(DATA); renderStar();
+  const first = document.querySelector("#starGrid .stitle"); if(first) first.focus();
+});
+let starTimer;
+document.getElementById("starGrid").addEventListener("input",e=>{
+  const card = e.target.closest(".scard"); if(!card || !e.target.dataset.f) return;
+  const rec = starRec(+card.dataset.sid); if(!rec) return;
+  const f = e.target.dataset.f;
+  rec[f] = e.target.value;
+  if(f==="title"){
+    const h = card.querySelector(".shead-title");
+    h.textContent = rec.title || "제목 없음 — 클릭해서 작성";
+    h.classList.toggle("empty", !rec.title);
+  }
+  if(f==="period") card.querySelector(".shead-period").textContent = rec.period;
+  clearTimeout(starTimer); starTimer = setTimeout(()=>store.save(DATA), 500);
+});
+document.getElementById("starGrid").addEventListener("change",e=>{
+  const card = e.target.closest(".scard"); if(!card || !e.target.dataset.f) return;
+  const rec = starRec(+card.dataset.sid); if(!rec) return;
+  rec[e.target.dataset.f] = e.target.value; store.save(DATA);
+  if(e.target.dataset.f==="cat") renderStar();
+});
+document.getElementById("starGrid").addEventListener("click",e=>{
+  const card = e.target.closest(".scard"); if(!card) return;
+  const rec = starRec(+card.dataset.sid); if(!rec) return;
+  if(e.target.closest(".sdel")){
+    if(confirm('"'+(rec.title||"제목 없음")+'" 기록을 삭제할까요?')){
+      DATA.__star = DATA.__star.filter(x=>x.id!==rec.id);
+      sOpen.delete(rec.id);
+      store.save(DATA); renderStar();
+    }
+    return;
+  }
+  if(e.target.closest(".shead")){
+    sOpen.has(rec.id) ? sOpen.delete(rec.id) : sOpen.add(rec.id);
+    renderStar();
+    return;
+  }
+  if(e.target.closest(".scopy")){
+    const txt = "["+(rec.title||"활동명")+"]"+(rec.period?" ("+rec.period+")":"")
+      +(rec.skills?"\n역량 키워드: "+rec.skills:"")
+      +"\n\nS (상황): "+(rec.s||"")+"\nT (과제): "+(rec.t||"")+"\nA (행동): "+(rec.a||"")+"\nR (결과): "+(rec.r||"");
+    const done = ()=>{ const b=e.target.closest(".scopy"); b.textContent="복사됨 ✓"; setTimeout(()=>b.textContent="📋 자소서용 텍스트 복사",1200); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done).catch(()=>{ fallbackCopy(txt); done(); });
+    } else { fallbackCopy(txt); done(); }
+  }
+});
+function fallbackCopy(txt){
+  const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand("copy"); }catch(e){} document.body.removeChild(ta);
+}
+
+/* ================= 부팅 & 로그인 ================= */
+async function afterLogin(session){
+  UID = session.user.id;
+  document.getElementById("loginGate").style.display="none";
+  const bm=document.getElementById("bootMsg");
+  bm.textContent="☁ 데이터 불러오는 중..."; bm.style.display="block";
+  try{
+    const {data,error}=await sbClient.from("tracker").select("data").eq("user_id",UID).maybeSingle();
+    DATA=(data&&data.data)||{};
+    if(error) console.error(error);
+  }catch(e){ DATA={}; }
+  if(!DATA||typeof DATA!=="object") DATA={};
+  ensureSeeds();
+  bm.style.display="none";
+  document.getElementById("boardView").style.display="block";
+  document.getElementById("logoutBtn").style.display="inline-block";
+  document.getElementById("evDate").value=fmtDate(new Date());
+  if(window.JOBS&&Array.isArray(window.JOBS.items)&&window.JOBS.items.length)
+    document.getElementById("jobsTab").textContent="최신 공고 ("+window.JOBS.items.length+")";
+  renderBoard();
+}
+async function boot(){
+  document.getElementById("boardView").style.display="none";
+  if(SUPABASE_URL.indexOf("여기에")===0){
+    document.getElementById("bootMsg").innerHTML="⚙ 아직 설정 전이에요.<br>SETUP_GUIDE.txt의 1~2단계대로 index.html 상단에 Supabase URL과 키를 붙여넣어 주세요.";
+    return;
+  }
+  sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  document.getElementById("bootMsg").style.display="none";
+  const {data:{session}} = await sbClient.auth.getSession();
+  if(session) afterLogin(session);
+  else document.getElementById("loginGate").style.display="flex";
+}
+document.getElementById("otpSendBtn").addEventListener("click", async ()=>{
+  const email=document.getElementById("loginEmail").value.trim();
+  if(!email){ alert("이메일을 입력해주세요."); return; }
+  const b=document.getElementById("otpSendBtn"); b.disabled=true; b.textContent="전송 중...";
+  const {error}=await sbClient.auth.signInWithOtp({email});
+  b.disabled=false; b.textContent="인증코드 다시 받기";
+  if(error){ alert("코드 전송 실패: "+error.message); return; }
+  document.getElementById("otpStep2").style.display="flex";
+  document.getElementById("loginHint").textContent=email+" 로 6자리 인증코드를 보냈어요. 메일함(스팸함 포함)을 확인해주세요.";
+});
+document.getElementById("otpVerifyBtn").addEventListener("click", async ()=>{
+  const email=document.getElementById("loginEmail").value.trim();
+  const token=document.getElementById("loginCode").value.trim();
+  if(!token){ alert("인증코드를 입력해주세요."); return; }
+  const {data,error}=await sbClient.auth.verifyOtp({email, token, type:"email"});
+  if(error||!data.session){ alert("인증 실패: 코드가 맞는지 확인해주세요."); return; }
+  afterLogin(data.session);
+});
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+  if(!confirm("로그아웃할까요? (데이터는 클라우드에 안전하게 남아있어요)")) return;
+  await sbClient.auth.signOut(); location.reload();
+});
+boot();
+</script>
+</body>
+</html>
