@@ -289,6 +289,7 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
       <input type="file" id="importFile" accept=".json" hidden>
     </div>
     <div class="chips" id="catChips"></div>
+    <div class="chips" id="sizeChips"></div>
     <div class="chips">
       <button class="chip tealchip" data-tg="fav">⭐ 즐겨찾기만</button>
       <button class="chip tealchip" data-tg="active">진행 중만</button>
@@ -556,7 +557,7 @@ if(!Array.isArray(DATA.__star)){
 const rec = n => DATA[n] || (DATA[n]={fav:false,status:"미지원",deadline:"",memo:"",url:""});
 
 /* ================= 상태 ================= */
-let filterCat = -1, query = "", sortMode = "default";
+let filterCat = -1, filterSize = "전체", query = "", sortMode = "default";
 let toggles = { fav:false, active:false, hideDone:false };
 const now = new Date();
 let calDoneOnly = false;
@@ -585,14 +586,19 @@ const portal = {
 };
 
 /* ================= 보드 렌더 ================= */
+const SIZES = ["전체","대","중견","중소","외국"];
+const SIZE_LABEL = {"전체":"전체 형태","대":"대기업","중견":"중견기업","중소":"중소기업","외국":"외국계"};
 function catChips(){
   const box = document.getElementById("catChips");
-  box.innerHTML = '<button class="chip '+(filterCat===-1?"on":"")+'" data-cat="-1">전체</button>' +
+  box.innerHTML = '<button class="chip '+(filterCat===-1?"on":"")+'" data-cat="-1">전체 직무</button>' +
     CATS.map((c,i)=>'<button class="chip '+(filterCat===i?"on":"")+'" data-cat="'+i+'">'+c+'</button>').join("");
+  const sbox = document.getElementById("sizeChips");
+  if(sbox) sbox.innerHTML = SIZES.map(sz=>'<button class="chip navychip '+(filterSize===sz?"on":"")+'" data-size="'+sz+'">'+SIZE_LABEL[sz]+'</button>').join("");
 }
 function visibleList(){
   let list = COMPANIES.filter(([n,e,c])=>{
     if(filterCat!==-1 && c!==filterCat) return false;
+    if(filterSize!=="전체" && (SIZE[n]||"중소")!==filterSize) return false;
     if(query && !(n+e).toLowerCase().includes(query)) return false;
     const r = rec(n);
     if(toggles.fav && !r.fav) return false;
