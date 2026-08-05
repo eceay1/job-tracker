@@ -1,8 +1,8 @@
 name: 채용공고 자동 업데이트
 on:
   schedule:
-    - cron: '0 22 * * *'   # 매일 한국시간 아침 7시
-  workflow_dispatch:        # 수동 실행(=갱신 버튼)
+    - cron: '0 22 * * *'
+  workflow_dispatch:
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -17,11 +17,24 @@ jobs:
         run: pip install beautifulsoup4
       - name: 공고 크롤링 (사람인)
         run: python update_jobs_crawl.py
-      - name: jobs.js 커밋 (충돌방지)
+      - name: jobs.js 커밋 (충돌 완전 방지)
         run: |
           git config user.name "job-bot"
           git config user.email "job-bot@users.noreply.github.com"
-          git add jobs.js
-          git commit -m "자동 공고 업데이트 $(date +'%Y-%m-%d %H:%M')" || { echo "변경 없음"; exit 0; }
-          git pull --rebase --autostash origin main || true
-          git push origin main
+          # 최대 5번까지 재시도: 매번 최신 받아서 jobs.js만 우리 것으로 덮어씀
+          for i in 1 2 3 4 5; do
+            git add jobs.js
+            git diff --cached --quiet && { echo "변경 없음"; exit 0; }
+            git commit -m "자동 공고 업데이트 $(date +'%Y-%m-%d %H:%M')"
+            git fetch origin main
+            # 원격 최신으로 리셋하되 우리 jobs.js는 보존
+            cp jobs.js /tmp/jobs.js.bak
+            git reset --hard origin/main
+            cp /tmp/jobs.js.bak jobs.js
+            git add jobs.js
+            git diff --cached --quiet && { echo "이미 최신"; exit 0; }
+            git commit -m "자동 공고 업데이트 $(date +'%Y-%m-%d %H:%M')"
+            if git push origin main; then echo "✅ push 성공"; exit 0; fi
+            echo "push 실패, 재시도 $i"; sleep 3
+          done
+          echo "5회 시도 후 실패"; exit 1
