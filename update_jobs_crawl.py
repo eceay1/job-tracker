@@ -78,9 +78,16 @@ def parse(html):
         # 조건(지역/경력/학력/고용형태)
         conds=[s.get_text(strip=True) for s in it.select(".job_condition span")]
         region=conds[0] if conds else ""
-        # 마감일
-        dead=it.select_one(".job_date .date")
-        deadline=dead.get_text(strip=True) if dead else ""
+        # 마감일 (여러 선택자 시도)
+        deadline=""
+        for sel in [".job_date .date", ".job_date span.date", ".date", ".job_days", "span.deadlines"]:
+            el=it.select_one(sel)
+            if el:
+                txt=el.get_text(strip=True)
+                if txt and ("D-" in txt or "~" in txt or "/" in txt or "마감" in txt or "채용시" in txt or "상시" in txt):
+                    deadline=txt; break
+                if txt and not deadline:
+                    deadline=txt
         # 직무 키워드
         sector=it.select_one(".job_sector")
         sector_txt=sector.get_text(" ",strip=True) if sector else ""
@@ -91,19 +98,29 @@ def parse(html):
 
 def norm_deadline(s):
     s=(s or "").strip()
+    today=datetime.date.today()
+    # D-7, D-day 형식
+    m=re.search(r"D-(\d+)", s)
+    if m:
+        return (today+datetime.timedelta(days=int(m.group(1)))).strftime("%Y-%m-%d")
+    if "오늘마감" in s or "D-DAY" in s.upper(): return today.strftime("%Y-%m-%d")
+    if "내일마감" in s: return (today+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    # ~MM/DD 또는 MM.DD 또는 ~YYYY.MM.DD
+    m=re.search(r"(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})", s)
+    if m:
+        try:
+            return datetime.date(int(m.group(1)),int(m.group(2)),int(m.group(3))).strftime("%Y-%m-%d")
+        except: pass
     m=re.search(r"~?\s*(\d{1,2})[/.](\d{1,2})", s)
     if m:
         mo,da=int(m.group(1)),int(m.group(2))
-        y=datetime.date.today().year
-        # 이미 지난 달이면 내년으로 (연말 케이스)
+        y=today.year
         try:
             d=datetime.date(y,mo,da)
-            if (d-datetime.date.today()).days < -30: d=datetime.date(y+1,mo,da)
+            if (d-today).days < -30: d=datetime.date(y+1,mo,da)
             return d.strftime("%Y-%m-%d")
         except: return ""
-    if "오늘마감" in s: return datetime.date.today().strftime("%Y-%m-%d")
-    if "내일마감" in s: return (datetime.date.today()+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-    return ""
+    return ""  # 상시채용/채용시까지 등은 마감일 없음
 
 def main():
     print("="*50); print("사람인 크롤링 시작 (개인 구직용 · 출처 표시)")
@@ -136,6 +153,12 @@ def main():
         time.sleep(0.8)
 
     items=sorted(got.values(), key=lambda x:(not x["fav"], x["deadline"] or "9999"))
+    with_dl=sum(1 for x in items if x["deadline"])
+    print(f"[통계] 전체 {len(items)}건 중 마감일 있는 공고: {with_dl}건 (상시/미표기: {len(items)-with_dl}건)")
+    # 마감일 있는 것 몇 개 샘플 출력
+    samples=[x for x in items if x["deadline"]][:5]
+    for x in samples:
+        print("   예시: %s | 마감 %s | %s" % (x["company"][:15], x["deadline"], x["title"][:25]))
     save(items)
 
 def save(items):
