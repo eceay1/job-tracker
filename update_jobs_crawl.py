@@ -142,9 +142,11 @@ def main():
                     # 관심기업 아니어도 반도체/전지 키워드 맞으면 포함
                 key=r["url"] or (r["company"]+r["title"])
                 if key in got: continue
+                dl=norm_deadline(r["deadline_raw"])
                 got[key]={"tracker":r["company"],"cat":cat,"company":r["company"],
                     "title":r["title"],"url":r["url"],"region":r["region"],
-                    "deadline":norm_deadline(r["deadline_raw"]),
+                    "deadline":dl,"expiration":dl,
+                    "closeType":(r["deadline_raw"] if not dl else ""),
                     "fav":is_fav,"note":("관심기업" if is_fav else "사람인")}
                 n+=1
             print(f"  '{kw}': {n}건 (누적 {len(got)})")
