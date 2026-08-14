@@ -111,7 +111,11 @@ main{max-width:1180px; margin:16px auto 60px; padding:0 22px; display:grid; grid
 .cell .dnum{font-size:12.5px; font-weight:700; align-self:flex-start; padding:1px 6px; border-radius:6px;}
 .cell.sun .dnum{color:var(--warn);}
 .cell.today .dnum{background:var(--teal); color:#fff;}
-.evchip{font-size:11px; font-weight:700; color:#fff; background:var(--c,#5B6B8C); border-radius:5px; padding:2px 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.evchip{font-size:11px; font-weight:700; color:#2A3342; background:var(--c,#5B6B8C); border-left:4px solid rgba(0,0,0,.28); border-radius:3px; padding:2px 6px 2px 7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; cursor:pointer; transition:filter .12s; filter:saturate(1);}
+.evchip{background-image:linear-gradient(rgba(255,255,255,.72),rgba(255,255,255,.72));}
+.evchip:hover{filter:brightness(.97);}
+.cell{display:flex; flex-direction:column; gap:0; padding:4px; min-height:92px;}
+.cell .dnum{margin-bottom:2px;}
 .evchip.more{background:#EEF1F7; color:var(--sub);}
 .cal-side{display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;}
 .panel{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:16px;}
@@ -259,10 +263,6 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 .jrow.row-중견{border-left:4px solid #B0B8C0;}
 .jrow.row-중소{border-left:4px solid #B87333;}
 .cal-jobfilter .chip.cjf.sz-on{background:#D4AF37; border-color:#D4AF37; color:#5A4300;}
-.evchip.bar-start{border-radius:5px 0 0 5px; margin-right:-6px; position:relative; z-index:1;}
-.evchip.bar-mid{border-radius:0; margin-left:-6px; margin-right:-6px; overflow:visible;}
-.evchip.bar-end{border-radius:0 5px 5px 0; margin-left:-6px;}
-.cell{overflow:visible;}
 </style>
 </head>
 <body>
@@ -758,20 +758,15 @@ function eventMap(){
   }
   DATA.__events.forEach(ev=>{
     if(calDoneOnly && !ev.done) return;
-    const s=new Date(ev.date+"T00:00:00");
-    const e= ev.endDate ? new Date(ev.endDate+"T00:00:00") : s;
     const multi = ev.endDate && ev.endDate!==ev.date;
-    let idx=0;
-    const totalDays = Math.round((e-s)/86400000)+1;
-    for(let d=new Date(s), i=0; d<=e && i<62; d.setDate(d.getDate()+1), i++, idx++){
-      let span="single";
-      if(multi){
-        if(idx===0) span="start";
-        else if(idx===totalDays-1) span="end";
-        else span="mid";
-      }
-      push(fmtDate(d), {kind:"ev",label:(ev.done?"✓ ":"")+ev.title,ev,color:ETYPES[ev.type]||"#5B6B8C",span:span});
+    let label=(ev.done?"✓ ":"")+ev.title;
+    if(multi){
+      // 기간을 시작일 칸에만, "제목 (8/20~26)" 형태로
+      const s=new Date(ev.date+"T00:00:00"), e=new Date(ev.endDate+"T00:00:00");
+      const md = x=>(x.getMonth()+1)+"/"+x.getDate();
+      label += " ("+md(s)+"~"+md(e)+")";
     }
+    push(ev.date, {kind:"ev",label:label,ev,color:ETYPES[ev.type]||"#5B6B8C"});
   });
   return map;
 }
@@ -795,12 +790,7 @@ function renderCal(){
     const extra = items.length-shown.length;
     cells += '<div class="cell'+(other?" other":"")+(key===todayStr?" today":"")+(i%7===0?" sun":"")+'" data-date="'+key+'">'
       +'<span class="dnum">'+dn+'</span>'
-      +shown.map((it,idx)=>{
-          const sp=it.span||"single";
-          const spanCls = sp==="single"?"":" bar-"+sp;
-          const showLabel = (sp==="single"||sp==="start");
-          return '<div class="evchip'+spanCls+'" style="--c:'+it.color+'" data-idx="'+idx+'" title="'+esc(it.label)+'">'+(showLabel?esc(it.label):"&nbsp;")+'</div>';
-        }).join("")
+      +shown.map((it,idx)=>'<div class="evchip" style="--c:'+it.color+'" data-idx="'+idx+'" title="'+esc(it.label)+'">'+esc(it.label)+'</div>').join("")
       +(extra>0?'<div class="evchip more">+'+extra+'개 더보기</div>':"")
       +'</div>';
   }
