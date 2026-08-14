@@ -239,6 +239,11 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 .sz-외국{background:#F3E9F7;color:#8E44AD;}
 .btn.on-teal{background:var(--teal);border-color:var(--teal);color:#fff;}
 .evchip.done-chip{opacity:.6;}
+.cal-jobfilter{display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin:8px 0 4px; padding:8px 10px; background:#FBF6EF; border:1px solid #F0E2CE; border-radius:10px;}
+.cjf-label{font-size:12px; font-weight:700; color:#8A6D3B; margin-right:2px;}
+.cjf-sep{color:#D8C4A8; margin:0 3px;}
+.chip.cjf{font-size:12px; padding:4px 10px;}
+.chip.cjf.on{background:#C77D2E; border-color:#C77D2E; color:#fff;}
 </style>
 </head>
 <body>
@@ -309,6 +314,20 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
       <button class="btn small" id="calToday">오늘</button>
       <button class="btn small" id="calNext">다음 달 ▶</button>
     </div>
+  </div>
+  <div class="cal-jobfilter" id="calJobFilter">
+    <span class="cjf-label">📌 공고 달력 표시:</span>
+    <button class="chip cjf on" data-jf="off">끄기</button>
+    <button class="chip cjf" data-jf="fav">⭐ 관심기업</button>
+    <button class="chip cjf" data-jf="urgent">🔥 마감임박(D-7)</button>
+    <button class="chip cjf" data-jf="all">전체</button>
+    <span class="cjf-sep">|</span>
+    <button class="chip cjf" data-jf="cat:0">칩 제조</button>
+    <button class="chip cjf" data-jf="cat:1">장비</button>
+    <button class="chip cjf" data-jf="cat:2">후공정</button>
+    <button class="chip cjf" data-jf="cat:3">소재·부품</button>
+    <button class="chip cjf" data-jf="cat:4">디스플레이</button>
+    <button class="chip cjf" data-jf="cat:5">배터리</button>
   </div>
   <div class="cal-wrap">
     <div class="cal-dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
@@ -561,6 +580,7 @@ let filterCat = -1, filterSize = "전체", query = "", sortMode = "default";
 let toggles = { fav:false, active:false, hideDone:false };
 const now = new Date();
 let calDoneOnly = false;
+let calJobFilter = "off";  // off/fav/urgent/all/cat:N
 let calYear = now.getFullYear(), calMonth = now.getMonth();
 
 /* ================= 유틸 ================= */
@@ -685,6 +705,24 @@ function eventMap(){
   const map = {};
   const push=(k,it)=>{ (map[k]=map[k]||[]).push(it); };
   COMPANIES.forEach(([n])=>{ const d=DATA[n]?.deadline; if(!d) return; if(calDoneOnly && !APPLIED_SET.has(DATA[n]?.status)) return; push(d,{kind:"dl",label:n+" 마감",name:n,color:DL_COLOR}); });
+  // 최신 공고(jobs.js)의 마감일 — 필터(calJobFilter)에 따라 표시
+  if(!calDoneOnly && calJobFilter!=="off" && window.JOBS && Array.isArray(window.JOBS.items)){
+    const seen={}; const today=new Date(); today.setHours(0,0,0,0);
+    window.JOBS.items.forEach(it=>{
+      const d=it.expiration||it.deadline; if(!d) return;
+      // 필터 조건
+      if(calJobFilter==="fav" && !it.fav) return;
+      if(calJobFilter.indexOf("cat:")===0 && it.cat!==+calJobFilter.split(":")[1]) return;
+      if(calJobFilter==="urgent"){
+        const dd=Math.round((new Date(d)-today)/86400000);
+        if(dd<0||dd>7) return;
+      }
+      const label=(it.company||it.tracker||"공고")+" 마감";
+      const dk=d+"|"+label;
+      if(seen[dk]) return; seen[dk]=1;
+      push(d,{kind:"jobdl",label:label,url:it.url,title:it.title,color:"#C77D2E"});
+    });
+  }
   DATA.__events.forEach(ev=>{
     if(calDoneOnly && !ev.done) return;
     const s=new Date(ev.date+"T00:00:00");
@@ -723,6 +761,7 @@ function renderCal(){
   document.getElementById("calGrid")._map = map;
   document.getElementById("legend").innerHTML =
     '<span><i style="background:'+DL_COLOR+'"></i>채용 마감 (자동)</span>'+
+    '<span><i style="background:#C77D2E"></i>공고 마감 (사람인)</span>'+
     Object.entries(ETYPES).map(([t,c])=>'<span><i style="background:'+c+'"></i>'+t+'</span>').join("");
 }
 
@@ -733,6 +772,15 @@ function closeModal(){ overlay.classList.remove("show"); }
 overlay.addEventListener("click",e=>{ if(e.target===overlay) closeModal(); });
 function showItem(it){
   if(it.kind==="dl"){
+    if(it.kind==="jobdl"){
+      openModal('<h3>'+esc(it.label)+'</h3>'
+        +'<div class="mline">'+esc(it.title||"")+'</div>'
+        +'<div class="mbtns">'
+        +(it.url?'<a class="btn primary" style="text-decoration:none" href="'+esc(it.url)+'" target="_blank" rel="noopener">공고 보기 ↗</a>':'')
+        +'<button class="btn" id="mClose">닫기</button></div>');
+      document.getElementById("mClose").onclick=closeModal;
+      return;
+    }
     openModal('<h3>'+esc(it.label)+'</h3><div class="mline">기업 카드의 마감일에서 자동 표시된 일정이에요.</div>'
       +'<div class="mbtns"><button class="btn primary" id="mGoBoard">기업 카드로 이동</button><button class="btn" id="mClose">닫기</button></div>');
     document.getElementById("mGoBoard").onclick=()=>{ closeModal(); gotoCompany(it.name); };
@@ -837,6 +885,13 @@ document.getElementById("ticker").addEventListener("click",e=>{
 });
 
 /* ================= 이벤트: 달력 ================= */
+document.getElementById("calJobFilter").addEventListener("click",e=>{
+  const b=e.target.closest("[data-jf]"); if(!b) return;
+  calJobFilter=b.dataset.jf;
+  document.querySelectorAll("#calJobFilter .cjf").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+  renderCal();
+});
 document.getElementById("calDoneFilter").addEventListener("click",e=>{
   calDoneOnly=!calDoneOnly;
   e.target.classList.toggle("on-teal", calDoneOnly);
