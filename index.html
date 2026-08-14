@@ -1159,7 +1159,22 @@ async function boot(){
     document.getElementById("bootMsg").innerHTML="⚙ 아직 설정 전이에요.<br>SETUP_GUIDE.txt의 1~2단계대로 index.html 상단에 Supabase URL과 키를 붙여넣어 주세요.";
     return;
   }
-  sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { detectSessionInUrl: true, flowType: "implicit", persistSession: true, autoRefreshToken: true }
+  });
+  // 매직링크가 루트(#access_token=...)로 떨어졌을 때 수동 복구
+  try {
+    const h = window.location.hash || "";
+    if (h.indexOf("access_token") > -1) {
+      const p = new URLSearchParams(h.substring(1));
+      const at = p.get("access_token"), rt = p.get("refresh_token");
+      if (at && rt) {
+        await sbClient.auth.setSession({ access_token: at, refresh_token: rt });
+        // 주소창 깨끗이 정리
+        history.replaceState(null, "", "https://eceay1.github.io/job-tracker/");
+      }
+    }
+  } catch(e){ console.warn("hash session restore failed", e); }
   document.getElementById("bootMsg").style.display="none";
   const {data:{session}} = await sbClient.auth.getSession();
   if(session) afterLogin(session);
@@ -1169,7 +1184,7 @@ document.getElementById("otpSendBtn").addEventListener("click", async ()=>{
   const email=document.getElementById("loginEmail").value.trim();
   if(!email){ alert("이메일을 입력해주세요."); return; }
   const b=document.getElementById("otpSendBtn"); b.disabled=true; b.textContent="전송 중...";
-  const {error}=await sbClient.auth.signInWithOtp({email});
+  const {error}=await sbClient.auth.signInWithOtp({email, options:{ emailRedirectTo: "https://eceay1.github.io/job-tracker/" }});
   b.disabled=false; b.textContent="인증코드 다시 받기";
   if(error){ alert("코드 전송 실패: "+error.message); return; }
   document.getElementById("otpStep2").style.display="flex";
