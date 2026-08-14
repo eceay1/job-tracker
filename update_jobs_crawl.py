@@ -83,6 +83,25 @@ def fetch(keyword, page=1):
     with urllib.request.urlopen(req, timeout=25, context=ctx) as r:
         return r.read().decode("utf-8","replace")
 
+def fetch_detail_dates(url):
+    """공고 상세페이지에서 접수 시작일/마감일 추출 (관심기업만 호출)"""
+    try:
+        req=urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=20, context=ctx) as r:
+            html=r.read().decode("utf-8","replace")
+        soup=BeautifulSoup(html,"html.parser")
+        text=soup.get_text(" ", strip=True)
+        # "시작일 2026.08.20 마감일 2026.08.26" 패턴
+        import re as _re
+        start=end=""
+        ms=_re.search(r"시작일\s*(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})", text)
+        me=_re.search(r"마감일\s*(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})", text)
+        if ms: start="%s-%02d-%02d"%(ms.group(1),int(ms.group(2)),int(ms.group(3)))
+        if me: end="%s-%02d-%02d"%(me.group(1),int(me.group(2)),int(me.group(3)))
+        return start, end
+    except Exception:
+        return "", ""
+
 def parse(html):
     soup=BeautifulSoup(html,"html.parser")
     out=[]
@@ -164,9 +183,16 @@ def main():
                 if key in got: continue
                 dl=norm_deadline(r["deadline_raw"])
                 sz=size_hit(r["company"])
+                start=""
+                # 관심기업 공고만 상세페이지에서 접수 시작일 추가 (차단방지: 관심기업만)
+                if is_fav and r["url"]:
+                    st,en=fetch_detail_dates(r["url"])
+                    if st: start=st
+                    if en: dl=en  # 상세 마감일이 더 정확
+                    time.sleep(0.6)  # 상세 요청 간 딜레이
                 got[key]={"tracker":r["company"],"cat":cat,"company":r["company"],
                     "title":r["title"],"url":r["url"],"region":r["region"],
-                    "deadline":dl,"expiration":dl,"size":sz,
+                    "start":start,"deadline":dl,"expiration":dl,"size":sz,
                     "closeType":(r["deadline_raw"] if not dl else ""),
                     "fav":is_fav,"note":("관심기업" if is_fav else "사람인")}
                 n+=1
