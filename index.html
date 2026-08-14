@@ -244,6 +244,21 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 .cjf-sep{color:#D8C4A8; margin:0 3px;}
 .chip.cjf{font-size:12px; padding:4px 10px;}
 .chip.cjf.on{background:#C77D2E; border-color:#C77D2E; color:#fff;}
+.szbadge{display:inline-block; font-size:10.5px; font-weight:800; padding:2px 9px; border-radius:6px; margin-left:5px; vertical-align:middle;}
+/* 금 - 대기업 */
+.szbadge.sz-대{background:linear-gradient(135deg,#D4AF37,#F4D03F,#C9A227); color:#5A4300; box-shadow:0 1px 3px rgba(196,162,39,.45); text-shadow:0 1px 0 rgba(255,255,255,.3);}
+/* 은 - 중견 */
+.szbadge.sz-중견{background:linear-gradient(135deg,#A8B0B8,#D8DEE5,#9AA3AD); color:#3A4149; box-shadow:0 1px 3px rgba(150,160,170,.4);}
+/* 동 - 중소 */
+.szbadge.sz-중소{background:linear-gradient(135deg,#B87333,#D89860,#A05A2C); color:#fff; box-shadow:0 1px 3px rgba(160,90,44,.4);}
+/* 외국계 - 눈에 띄는 청록+에메랄드 */
+.szbadge.sz-외국{background:linear-gradient(135deg,#00B8A9,#1DE9B6); color:#00332E; box-shadow:0 1px 4px rgba(0,184,169,.45); font-weight:900;}
+.szbadge.sz-기타{background:#F0F1F3; color:#9AA5B5;}
+.jrow.row-대{border-left:4px solid #D4AF37;}
+.jrow.row-외국{border-left:4px solid #00B8A9;}
+.jrow.row-중견{border-left:4px solid #B0B8C0;}
+.jrow.row-중소{border-left:4px solid #B87333;}
+.cal-jobfilter .chip.cjf.sz-on{background:#D4AF37; border-color:#D4AF37; color:#5A4300;}
 </style>
 </head>
 <body>
@@ -328,6 +343,11 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
     <button class="chip cjf" data-jf="cat:3">소재·부품</button>
     <button class="chip cjf" data-jf="cat:4">디스플레이</button>
     <button class="chip cjf" data-jf="cat:5">배터리</button>
+    <span class="cjf-sep">|</span>
+    <button class="chip cjf" data-jf="sz:대">🥇 대기업</button>
+    <button class="chip cjf" data-jf="sz:중견">🥈 중견</button>
+    <button class="chip cjf" data-jf="sz:중소">🥉 중소</button>
+    <button class="chip cjf" data-jf="sz:외국">🌐 외국계</button>
   </div>
   <div class="cal-wrap">
     <div class="cal-dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
@@ -378,6 +398,13 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
     <div class="jctrl">
       <input type="text" id="jq" placeholder="공고 제목 · 기업명 검색">
       <select id="jcat"><option value="-1">전체 분야</option></select>
+      <select id="jsize">
+        <option value="">전체 형태</option>
+        <option value="대">대기업</option>
+        <option value="외국">외국계</option>
+        <option value="중견">중견기업</option>
+        <option value="중소">중소기업</option>
+      </select>
       <select id="jsort">
         <option value="exp">마감 임박순</option>
         <option value="new">최신 등록순</option>
@@ -713,14 +740,16 @@ function eventMap(){
       // 필터 조건
       if(calJobFilter==="fav" && !it.fav) return;
       if(calJobFilter.indexOf("cat:")===0 && it.cat!==+calJobFilter.split(":")[1]) return;
+      if(calJobFilter.indexOf("sz:")===0 && (it.size||"")!==calJobFilter.split(":")[1]) return;
       if(calJobFilter==="urgent"){
         const dd=Math.round((new Date(d)-today)/86400000);
         if(dd<0||dd>7) return;
       }
+      const SZC={"대":"#D4AF37","외국":"#00B8A9","중견":"#A8B0B8","중소":"#B87333","":"#C77D2E"};
       const label=(it.company||it.tracker||"공고")+" 마감";
       const dk=d+"|"+label;
       if(seen[dk]) return; seen[dk]=1;
-      push(d,{kind:"jobdl",label:label,url:it.url,title:it.title,color:"#C77D2E"});
+      push(d,{kind:"jobdl",label:label,url:it.url,title:it.title,color:SZC[it.size||""]});
     });
   }
   DATA.__events.forEach(ev=>{
@@ -955,7 +984,7 @@ function jobsFor(n){
   if(!window.JOBS || !Array.isArray(window.JOBS.items)) return [];
   return window.JOBS.items.filter(it=>it.tracker===n);
 }
-let jQuery2="", jCat=-1, jSort="exp";
+let jQuery2="", jCat=-1, jSize="", jSort="exp";
 document.getElementById("jcat").innerHTML += CATS.map((c,i)=>'<option value="'+i+'">'+c+'</option>').join("");
 function renderJobs(){
   const wrap = document.getElementById("jobsList");
@@ -975,6 +1004,7 @@ function renderJobs(){
   }
   const items = window.JOBS.items.filter(it=>{
     if(jCat!==-1 && it.cat!==jCat) return false;
+    if(jSize && (it.size||"")!==jSize) return false;
     if(jQuery2 && !(it.tracker+it.company+it.title).toLowerCase().includes(jQuery2)) return false;
     return true;
   });
@@ -985,8 +1015,12 @@ function renderJobs(){
   if(!items.length){ wrap.innerHTML = '<div class="empty">조건에 맞는 공고가 없어요.</div>'; return; }
   wrap.innerHTML = items.map((it,i)=>{
     const dd = it.expiration ? dday(it.expiration) : null;
-    return '<div class="jrow">'
+    const SZL={"대":"대기업","외국":"외국계","중견":"중견","중소":"중소","":"기타"};
+    const sz=it.size||"";
+    const rowCls=(sz==="대"||sz==="외국"||sz==="중견"||sz==="중소")?" row-"+sz:"";
+    return '<div class="jrow'+rowCls+'">'
       +'<div class="jmain"><span class="jco c'+it.cat+'">'+esc(it.tracker)+'</span>'
+      +'<span class="szbadge sz-'+(sz||"기타")+'">'+SZL[sz]+'</span>'
       +(it.bbs?'<span class="gcbadge">공채속보</span>':"")
       +'<a class="jtitle" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+' ↗</a>'
       +'<div class="jsub">'+esc(it.company)+(it.location?' · '+esc(it.location):'')+(it.jobType?' · '+esc(it.jobType):'')+(it.career?' · '+esc(it.career):'')+'</div></div>'
@@ -1003,6 +1037,7 @@ document.getElementById("jobsReload").addEventListener("click",()=>{
 });
 document.getElementById("jq").addEventListener("input",e=>{ jQuery2=e.target.value.trim().toLowerCase(); renderJobs(); });
 document.getElementById("jcat").addEventListener("change",e=>{ jCat=+e.target.value; renderJobs(); });
+document.getElementById("jsize").addEventListener("change",e=>{ jSize=e.target.value; renderJobs(); });
 document.getElementById("jsort").addEventListener("change",e=>{ jSort=e.target.value; renderJobs(); });
 document.getElementById("jobsList").addEventListener("click",e=>{
   const b = e.target.closest("[data-apply]"); if(!b) return;
