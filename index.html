@@ -263,6 +263,12 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 .jrow.row-중견{border-left:4px solid #B0B8C0;}
 .jrow.row-중소{border-left:4px solid #B87333;}
 .cal-jobfilter .chip.cjf.sz-on{background:#D4AF37; border-color:#D4AF37; color:#5A4300;}
+.cell{overflow:visible !important;}
+.evchip.chip-start{border-radius:4px 0 0 4px; margin-right:-5px; padding-right:8px; z-index:2;}
+.evchip.chip-mid{border-radius:0; margin-left:-5px; margin-right:-5px; padding-left:9px; z-index:1; color:transparent;}
+.evchip.chip-end{border-radius:0 4px 4px 0; margin-left:-5px; padding-left:9px; z-index:1; color:transparent;}
+.evchip.chip-mid, .evchip.chip-end{background-image:linear-gradient(rgba(255,255,255,.72),rgba(255,255,255,.72));}
+.frow-label{font-size:11.5px; font-weight:700; color:var(--sub); margin:6px 0 2px;}
 </style>
 </head>
 <body>
@@ -336,8 +342,8 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
   </div>
   <div class="cal-jobfilter" id="calJobFilter">
     <span class="cjf-label">📌 공고 달력 표시:</span>
-    <button class="chip cjf on" data-jf="off">끄기</button>
-    <button class="chip cjf" data-jf="fav">⭐ 관심기업</button>
+    <button class="chip cjf" data-jf="off">끄기</button>
+    <button class="chip cjf on" data-jf="fav">⭐ 관심기업</button>
     <button class="chip cjf" data-jf="urgent">🔥 마감임박(D-7)</button>
     <button class="chip cjf" data-jf="all">전체</button>
     <span class="cjf-sep">|</span>
@@ -364,6 +370,12 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
       <h3>일정 추가</h3>
       <div class="evform">
         <input type="text" id="evTitle" placeholder="일정 이름 (예: 서울대 반도체공동연구소 공정실습)">
+        <div class="frow-label">📝 신청기간 (선택)</div>
+        <div class="frow">
+          <input type="date" id="evApplyStart" title="신청 시작일" placeholder="신청 시작">
+          <input type="date" id="evApplyEnd" title="신청 마감일" placeholder="신청 마감">
+        </div>
+        <div class="frow-label">📅 실습·행사 기간</div>
         <div class="frow">
           <input type="date" id="evDate" title="시작일">
           <input type="date" id="evEnd" title="종료일 (선택)">
@@ -611,7 +623,7 @@ let filterCat = -1, filterSize = "전체", query = "", sortMode = "default";
 let toggles = { fav:false, active:false, hideDone:false };
 const now = new Date();
 let calDoneOnly = false;
-let calJobFilter = "off";  // off/fav/urgent/all/cat:N
+let calJobFilter = "fav";  // 기본: 관심기업 공고 마감 표시
 let calYear = now.getFullYear(), calMonth = now.getMonth();
 
 /* ================= 유틸 ================= */
@@ -750,23 +762,52 @@ function eventMap(){
         if(dd<0||dd>7) return;
       }
       const SZC={"대":"#D4AF37","외국":"#00B8A9","중견":"#A8B0B8","중소":"#B87333","":"#C77D2E"};
-      const label=(it.company||it.tracker||"공고")+" 마감";
-      const dk=d+"|"+label;
+      const color=SZC[it.size||""];
+      const nm=(it.company||it.tracker||"공고");
+      const dk=(it.start||"")+"|"+d+"|"+nm;
       if(seen[dk]) return; seen[dk]=1;
-      push(d,{kind:"jobdl",label:label,url:it.url,title:it.title,color:SZC[it.size||""]});
+      // 접수 시작일이 있으면 시작~마감 기간 띠, 없으면 마감일 점
+      if(it.start && it.start!==d && it.start < d){
+        const sD=new Date(it.start+"T00:00:00"), eD=new Date(d+"T00:00:00");
+        const totalDays=Math.round((eD-sD)/86400000)+1;
+        let idx=0;
+        for(let dd=new Date(sD); dd<=eD && idx<62; dd.setDate(dd.getDate()+1), idx++){
+          let span = idx===0?"start" : (idx===totalDays-1?"end":"mid");
+          const lab = idx===0 ? (nm+" 접수 ("+(sD.getMonth()+1)+"/"+sD.getDate()+"~"+(eD.getMonth()+1)+"/"+eD.getDate()+")") : nm;
+          push(fmtDate(dd),{kind:"jobdl",label:lab,url:it.url,title:it.title,color:color,jspan:span});
+        }
+      } else {
+        push(d,{kind:"jobdl",label:nm+" 마감",url:it.url,title:it.title,color:color});
+      }
     });
   }
   DATA.__events.forEach(ev=>{
     if(calDoneOnly && !ev.done) return;
-    const multi = ev.endDate && ev.endDate!==ev.date;
-    let label=(ev.done?"✓ ":"")+ev.title;
-    if(multi){
-      // 기간을 시작일 칸에만, "제목 (8/20~26)" 형태로
-      const s=new Date(ev.date+"T00:00:00"), e=new Date(ev.endDate+"T00:00:00");
-      const md = x=>(x.getMonth()+1)+"/"+x.getDate();
-      label += " ("+md(s)+"~"+md(e)+")";
+    const color=ETYPES[ev.type]||"#5B6B8C";
+    const md = x=>(x.getMonth()+1)+"/"+x.getDate();
+    // 신청기간 띠 (applyStart~applyEnd)
+    if(ev.applyStart && ev.applyEnd){
+      const sD=new Date(ev.applyStart+"T00:00:00"), eD=new Date(ev.applyEnd+"T00:00:00");
+      const td=Math.round((eD-sD)/86400000)+1; let i=0;
+      for(let d=new Date(sD); d<=eD&&i<62; d.setDate(d.getDate()+1),i++){
+        const sp=i===0?"start":(i===td-1?"end":"mid");
+        const lab=i===0?("📝 "+ev.title+" 신청 ("+md(sD)+"~"+md(eD)+")"):ev.title;
+        push(fmtDate(d),{kind:"ev",label:lab,ev,color:"#C97F17",span:sp});
+      }
     }
-    push(ev.date, {kind:"ev",label:label,ev,color:ETYPES[ev.type]||"#5B6B8C"});
+    // 실습/행사 기간 띠 (date~endDate)
+    const multi = ev.endDate && ev.endDate!==ev.date;
+    if(multi){
+      const sD=new Date(ev.date+"T00:00:00"), eD=new Date(ev.endDate+"T00:00:00");
+      const td=Math.round((eD-sD)/86400000)+1; let i=0;
+      for(let d=new Date(sD); d<=eD&&i<62; d.setDate(d.getDate()+1),i++){
+        const sp=i===0?"start":(i===td-1?"end":"mid");
+        const lab=i===0?((ev.done?"✓ ":"")+ev.title+" ("+md(sD)+"~"+md(eD)+")"):ev.title;
+        push(fmtDate(d),{kind:"ev",label:lab,ev,color:color,span:sp});
+      }
+    } else if(!ev.applyStart || ev.date){
+      push(ev.date, {kind:"ev",label:(ev.done?"✓ ":"")+ev.title,ev,color:color});
+    }
   });
   return map;
 }
@@ -790,15 +831,23 @@ function renderCal(){
     const extra = items.length-shown.length;
     cells += '<div class="cell'+(other?" other":"")+(key===todayStr?" today":"")+(i%7===0?" sun":"")+'" data-date="'+key+'">'
       +'<span class="dnum">'+dn+'</span>'
-      +shown.map((it,idx)=>'<div class="evchip" style="--c:'+it.color+'" data-idx="'+idx+'" title="'+esc(it.label)+'">'+esc(it.label)+'</div>').join("")
+      +shown.map((it,idx)=>{
+          const sp=it.jspan||it.span||"";
+          const c = sp? " chip-"+sp : "";
+          const showText = (!sp || sp==="start");
+          return '<div class="evchip'+c+'" style="--c:'+it.color+'" data-idx="'+idx+'" title="'+esc(it.label)+'">'+(showText?esc(it.label):"&nbsp;")+'</div>';
+        }).join("")
       +(extra>0?'<div class="evchip more">+'+extra+'개 더보기</div>':"")
       +'</div>';
   }
   document.getElementById("calGrid").innerHTML = cells;
   document.getElementById("calGrid")._map = map;
   document.getElementById("legend").innerHTML =
-    '<span><i style="background:'+DL_COLOR+'"></i>채용 마감 (자동)</span>'+
-    '<span><i style="background:#C77D2E"></i>공고 마감 (사람인)</span>'+
+    '<span><i style="background:#D4AF37"></i>🥇대기업</span>'+
+    '<span><i style="background:#A8B0B8"></i>🥈중견</span>'+
+    '<span><i style="background:#B87333"></i>🥉중소</span>'+
+    '<span><i style="background:#00B8A9"></i>🌐외국계</span>'+
+    '<span><i style="background:#C97F17"></i>📝신청기간</span>'+
     Object.entries(ETYPES).map(([t,c])=>'<span><i style="background:'+c+'"></i>'+t+'</span>').join("");
 }
 
@@ -954,20 +1003,27 @@ document.getElementById("calGrid").addEventListener("click",e=>{
 document.getElementById("addEvBtn").addEventListener("click",()=>{
   const title = document.getElementById("evTitle").value.trim();
   const date = document.getElementById("evDate").value;
-  if(!title || !date){ alert("일정 이름과 시작일을 입력해주세요."); return; }
+  const aStart = document.getElementById("evApplyStart").value;
+  const aEnd = document.getElementById("evApplyEnd").value;
+  if(!title){ alert("일정 이름을 입력해주세요."); return; }
+  if(!date && !(aStart&&aEnd)){ alert("실습 시작일 또는 신청기간을 입력해주세요."); return; }
   const end = document.getElementById("evEnd").value;
-  if(end && end<date){ alert("종료일이 시작일보다 빠를 수 없어요."); return; }
+  if(end && date && end<date){ alert("종료일이 시작일보다 빠를 수 없어요."); return; }
+  if(aStart && aEnd && aEnd<aStart){ alert("신청 마감일이 시작일보다 빠를 수 없어요."); return; }
   DATA.__events.push({
     id: Date.now(),
-    title, date,
+    title, date: date || aStart,
     endDate: end||"",
+    applyStart: aStart||"",
+    applyEnd: aEnd||"",
     type: document.getElementById("evType").value,
     link: document.getElementById("evLink").value.trim(),
     memo: document.getElementById("evMemo").value.trim()
   });
   store.save(DATA);
-  ["evTitle","evEnd","evLink","evMemo"].forEach(id=>document.getElementById(id).value="");
-  const d=new Date(date+"T00:00:00"); calYear=d.getFullYear(); calMonth=d.getMonth();
+  ["evTitle","evDate","evEnd","evApplyStart","evApplyEnd","evLink","evMemo"].forEach(id=>document.getElementById(id).value="");
+  const jumpTo = date || aStart;
+  const d=new Date(jumpTo+"T00:00:00"); calYear=d.getFullYear(); calMonth=d.getMonth();
   renderCal(); renderStats(); renderTicker();
 });
 
