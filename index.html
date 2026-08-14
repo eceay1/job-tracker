@@ -259,6 +259,10 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 .jrow.row-중견{border-left:4px solid #B0B8C0;}
 .jrow.row-중소{border-left:4px solid #B87333;}
 .cal-jobfilter .chip.cjf.sz-on{background:#D4AF37; border-color:#D4AF37; color:#5A4300;}
+.evchip.bar-start{border-radius:5px 0 0 5px; margin-right:-6px; position:relative; z-index:1;}
+.evchip.bar-mid{border-radius:0; margin-left:-6px; margin-right:-6px; overflow:visible;}
+.evchip.bar-end{border-radius:0 5px 5px 0; margin-left:-6px;}
+.cell{overflow:visible;}
 </style>
 </head>
 <body>
@@ -756,8 +760,17 @@ function eventMap(){
     if(calDoneOnly && !ev.done) return;
     const s=new Date(ev.date+"T00:00:00");
     const e= ev.endDate ? new Date(ev.endDate+"T00:00:00") : s;
-    for(let d=new Date(s), i=0; d<=e && i<62; d.setDate(d.getDate()+1), i++){
-      push(fmtDate(d), {kind:"ev",label:(ev.done?"✓ ":"")+ev.title,ev,color:ETYPES[ev.type]||"#5B6B8C"});
+    const multi = ev.endDate && ev.endDate!==ev.date;
+    let idx=0;
+    const totalDays = Math.round((e-s)/86400000)+1;
+    for(let d=new Date(s), i=0; d<=e && i<62; d.setDate(d.getDate()+1), i++, idx++){
+      let span="single";
+      if(multi){
+        if(idx===0) span="start";
+        else if(idx===totalDays-1) span="end";
+        else span="mid";
+      }
+      push(fmtDate(d), {kind:"ev",label:(ev.done?"✓ ":"")+ev.title,ev,color:ETYPES[ev.type]||"#5B6B8C",span:span});
     }
   });
   return map;
@@ -782,7 +795,12 @@ function renderCal(){
     const extra = items.length-shown.length;
     cells += '<div class="cell'+(other?" other":"")+(key===todayStr?" today":"")+(i%7===0?" sun":"")+'" data-date="'+key+'">'
       +'<span class="dnum">'+dn+'</span>'
-      +shown.map((it,idx)=>'<div class="evchip" style="--c:'+it.color+'" data-idx="'+idx+'">'+esc(it.label)+'</div>').join("")
+      +shown.map((it,idx)=>{
+          const sp=it.span||"single";
+          const spanCls = sp==="single"?"":" bar-"+sp;
+          const showLabel = (sp==="single"||sp==="start");
+          return '<div class="evchip'+spanCls+'" style="--c:'+it.color+'" data-idx="'+idx+'" title="'+esc(it.label)+'">'+(showLabel?esc(it.label):"&nbsp;")+'</div>';
+        }).join("")
       +(extra>0?'<div class="evchip more">+'+extra+'개 더보기</div>':"")
       +'</div>';
   }
