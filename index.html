@@ -7,38 +7,39 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
-  --ink:#0F1E3D; --navy:#1B3A6B; --navy-d:#122A50; --teal:#0E9594; --teal-l:#E3F4F3;
-  --bg:#F4F6FB; --card:#FFFFFF; --line:#DCE3F0; --sub:#5B6B8C;
-  --warn:#D9414B; --warn-bg:#FCEBEC; --amber:#C97F17; --amber-bg:#FBF1DF;
+  --ink:#15181D; --navy:#2C4A7C; --navy-d:#233C66; --teal:#2C4A7C; --teal-l:#EEF2F8;
+  --bg:#FBFBFC; --card:#FFFFFF; --line:#EAECF0; --sub:#6B7280;
+  --warn:#C0392B; --warn-bg:#FBEDEB; --amber:#B8791C; --amber-bg:#FaF3E6;
+  --accent:#2C4A7C;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.5;}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;}
 button{font-family:inherit; cursor:pointer;}
 input,select,textarea{font-family:inherit; font-size:14px; color:var(--ink);}
 
 /* ---------- header ---------- */
-header{background:linear-gradient(135deg,var(--navy-d) 0%, var(--navy) 62%, #14507A 100%); color:#fff; padding:26px 22px 0;}
+header{background:var(--card); color:var(--ink); padding:30px 22px 0; border-bottom:1px solid var(--line);}
 .hd-inner{max-width:1180px; margin:0 auto;}
 .hd-top{display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px;}
-.hd-eyebrow{font-size:12px; letter-spacing:.14em; color:#9FC3D9; font-weight:600;}
+.hd-eyebrow{font-size:11px; letter-spacing:.18em; color:var(--sub); font-weight:700; text-transform:uppercase;}
 h1{font-size:26px; font-weight:800; letter-spacing:-.01em; margin-top:4px;}
-h1 .teal{color:#5ED4CE;}
+h1 .teal{color:var(--accent);}
 .hd-stats{display:flex; gap:10px; flex-wrap:wrap;}
-.stat{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16); border-radius:10px; padding:8px 14px; text-align:center; min-width:82px;}
-.stat b{display:block; font-size:20px; font-weight:800; line-height:1.2;}
-.stat span{font-size:11.5px; color:#B9CCE6;}
+.stat{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:9px 15px; text-align:center; min-width:80px;}
+.stat b{display:block; font-size:21px; font-weight:800; line-height:1.2; color:var(--ink); letter-spacing:-.02em;}
+.stat span{font-size:11px; color:var(--sub); font-weight:500;}
 .ticker{max-width:1180px; margin:16px auto 0; display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin;}
 .ticker:empty{display:none;}
-.tick{flex:0 0 auto; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:6px 14px 6px 8px; font-size:13px; color:#EAF1FA; cursor:pointer; transition:background .15s;}
-.tick:hover{background:rgba(255,255,255,.2);}
-.tick .dd{font-weight:800; font-size:12px; border-radius:999px; padding:2px 9px; background:#5ED4CE; color:#0B2A29;}
+.tick{flex:0 0 auto; display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:6px 14px 6px 8px; font-size:13px; color:var(--ink); cursor:pointer; transition:all .15s;}
+.tick:hover{background:var(--teal-l); border-color:var(--accent);}
+.tick .dd{font-weight:800; font-size:12px; border-radius:999px; padding:2px 9px; background:var(--accent); color:#fff;}
 .tick .dd.urgent{background:#FF8B93; color:#4A0A10;}
 .tick .dot{width:8px; height:8px; border-radius:50%;}
 /* tabs */
-.tabs{max-width:1180px; margin:16px auto 0; display:flex; gap:4px;}
-.tab{background:rgba(255,255,255,.10); color:#C8D8EE; border:none; padding:11px 22px; font-size:14.5px; font-weight:700; border-radius:12px 12px 0 0;}
-.tab.on{background:var(--bg); color:var(--navy);}
+.tabs{max-width:1180px; margin:18px auto 0; display:flex; gap:0; border-bottom:1px solid transparent;}
+.tab{background:none; color:var(--sub); border:none; border-bottom:2.5px solid transparent; padding:12px 4px; margin-right:22px; font-size:14.5px; font-weight:600; border-radius:0; transition:color .15s;}
+.tab.on{background:none; color:var(--ink); border-bottom-color:var(--accent); font-weight:700;}
 
 /* ---------- toolbar ---------- */
 .toolbar{max-width:1180px; margin:18px auto 0; padding:0 22px; display:flex; flex-direction:column; gap:10px;}
@@ -48,21 +49,23 @@ h1 .teal{color:#5ED4CE;}
 .search input:focus{border-color:var(--teal);}
 .search svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; stroke:var(--sub);}
 .row1 select{padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none;}
-.btn{padding:10px 14px; border-radius:10px; border:1.5px solid var(--line); background:var(--card); font-size:13.5px; font-weight:600; color:var(--navy); transition:all .15s;}
+.btn{padding:9px 14px; border-radius:9px; border:1px solid var(--line); background:var(--card); font-size:13.5px; font-weight:600; color:var(--ink); transition:all .14s;}
 .btn:hover{border-color:var(--navy);}
 .btn.small{padding:7px 12px; font-size:12.5px;}
-.btn.primary{background:var(--teal); border-color:var(--teal); color:#fff;}
+.btn:hover{border-color:#D0D5DD; background:#FAFBFC;}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
 .btn.primary:hover{filter:brightness(.94);}
 .chips{display:flex; gap:7px; flex-wrap:wrap;}
-.chip{padding:7px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--card); font-size:13px; font-weight:600; color:var(--sub); transition:all .15s;}
+.chip{padding:6px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:12.5px; font-weight:600; color:var(--sub); transition:all .14s;}
 .chip:hover{border-color:var(--navy); color:var(--navy);}
-.chip.on{background:var(--navy); border-color:var(--navy); color:#fff;}
-.chip.on.tealchip{background:var(--teal); border-color:var(--teal);}
+.chip.on{background:var(--ink); border-color:var(--ink); color:#fff;}
+.chip.on.tealchip{background:var(--accent); border-color:var(--accent);}
 
 /* ---------- grid ---------- */
 main{max-width:1180px; margin:16px auto 60px; padding:0 22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px;}
 .empty{grid-column:1/-1; text-align:center; color:var(--sub); padding:60px 0; font-size:15px;}
-.card{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:16px 16px 14px; display:flex; flex-direction:column; gap:10px; transition:box-shadow .15s, border-color .15s;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 16px 14px; display:flex; flex-direction:column; gap:10px; box-shadow:0 1px 2px rgba(16,24,40,.04); transition:box-shadow .16s, transform .16s;}
+.card:hover{box-shadow:0 4px 16px rgba(16,24,40,.08); transform:translateY(-1px);}
 .card:hover{box-shadow:0 4px 18px rgba(15,30,61,.08);}
 .card.fav{border-color:var(--teal);}
 .card.done{opacity:.55;}
@@ -105,6 +108,7 @@ main{max-width:1180px; margin:16px auto 60px; padding:0 22px; display:grid; grid
 .cal-dow div:first-child{color:var(--warn);}
 .cal-grid{display:grid; grid-template-columns:repeat(7,1fr);}
 .cell{min-height:104px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:6px; cursor:pointer; transition:background .12s; display:flex; flex-direction:column; gap:3px; overflow:hidden;}
+.cell:hover{background:#FAFBFC;}
 .cell:nth-child(7n){border-right:none;}
 .cell:hover{background:#F7F9FD;}
 .cell.other{background:#FAFBFD; color:#B7C1D6;}
@@ -118,7 +122,7 @@ main{max-width:1180px; margin:16px auto 60px; padding:0 22px; display:grid; grid
 .cell .dnum{margin-bottom:2px;}
 .evchip.more{background:#EEF1F7; color:var(--sub);}
 .cal-side{display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;}
-.panel{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:16px;}
+.panel{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:0 1px 2px rgba(16,24,40,.04);}
 .panel h3{font-size:15px; font-weight:800; margin-bottom:10px;}
 .evform{display:flex; flex-direction:column; gap:8px;}
 .evform .frow{display:flex; gap:8px; flex-wrap:wrap;}
@@ -153,12 +157,13 @@ main{max-width:1180px; margin:16px auto 60px; padding:0 22px; display:grid; grid
 .jctrl select{padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none;}
 .jctrl input{padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); outline:none; min-width:200px;}
 .jctrl input:focus,.jctrl select:focus{border-color:var(--teal);}
-.jrow{background:var(--card); border:1.5px solid var(--line); border-radius:12px; padding:13px 16px; display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; transition:border-color .12s;}
+.jrow{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px 16px; display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; box-shadow:0 1px 2px rgba(16,24,40,.03); transition:all .14s;}
+.jrow:hover{border-color:#D0D5DD; box-shadow:0 2px 8px rgba(16,24,40,.06);}
 .jrow:hover{border-color:var(--navy);}
 .jmain{flex:1 1 320px; min-width:0;}
-.jco{display:inline-block; font-size:11.5px; font-weight:800; color:#fff; background:var(--navy); border-radius:6px; padding:2px 8px; margin-bottom:4px;}
-.jco.c5{background:var(--amber);}
-.jco.c3,.jco.c4{background:var(--teal);}
+.jco{display:inline-block; font-size:11px; font-weight:700; color:var(--accent); background:var(--teal-l); border-radius:6px; padding:2px 8px; margin-bottom:4px;}
+.jco.c5{background:var(--amber-bg); color:var(--amber);}
+.jco.c3,.jco.c4{background:var(--teal-l); color:var(--accent);}
 .gcbadge{display:inline-block; font-size:11px; font-weight:800; color:var(--warn); background:var(--warn-bg); border-radius:6px; padding:2px 8px; margin-left:5px; margin-bottom:4px; vertical-align:top;}
 .jtitle{display:block; font-size:14.5px; font-weight:700; color:var(--ink); text-decoration:none; line-height:1.4;}
 .jtitle:hover{color:var(--teal); text-decoration:underline;}
@@ -272,9 +277,9 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
   <div class="hd-inner">
     <div class="hd-top">
       <div>
-        <div class="hd-eyebrow">JEONGYUN'S JOB BOARD · MY SITE</div>
+        <div class="hd-eyebrow">이정윤 · 취업 트래커</div>
         <h1>채용 트래커 <span class="teal">/</span> 반도체 · 배터리</h1>
-        <div style="font-size:11.5px; color:#B9CCE6; margin-top:4px;">☁ 클라우드 동기화 — 어떤 기기에서 접속해도 이어져요
+        <div style="font-size:12.5px; color:var(--sub); margin-top:6px;">반도체·이차전지 채용 공고와 지원 일정 관리
           <button id="logoutBtn" style="display:none; margin-left:8px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:#DCE8F5; border-radius:999px; padding:2px 10px; font-size:11px; cursor:pointer;">로그아웃</button>
         </div>
       </div>
@@ -291,7 +296,7 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
       <button class="tab" data-tab="cal">월간 달력</button>
       <button class="tab" data-tab="jobs" id="jobsTab">최신 공고</button>
       <button class="tab" data-tab="act">교육·대외활동</button>
-      <button class="tab" data-tab="star">활동기록 STAR</button>
+      <button class="tab" data-tab="star">경험 정리</button>
     </nav>
   </div>
 </header>
@@ -329,14 +334,14 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
   <div class="cal-head">
     <div class="cal-title" id="calTitle"></div>
     <div class="cal-nav">
-      <button class="btn small" id="calDoneFilter" title="신청 완료 체크한 일정만 보기">☑ 신청한 것만</button>
+      <button class="btn small" id="calDoneFilter" title="신청 완료한 일정만 보기">신청한 것만</button>
       <button class="btn small" id="calPrev">◀ 이전 달</button>
       <button class="btn small" id="calToday">오늘</button>
       <button class="btn small" id="calNext">다음 달 ▶</button>
     </div>
   </div>
   <div class="cal-jobfilter" id="calJobFilter">
-    <span class="cjf-label">📌 공고 달력 표시:</span>
+    <span class="cjf-label">공고 표시</span>
     <button class="chip cjf" data-jf="off">끄기</button>
     <button class="chip cjf on" data-jf="fav">⭐ 관심기업</button>
     <button class="chip cjf" data-jf="urgent">🔥 마감임박(D-7)</button>
@@ -403,7 +408,7 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 <div id="jobsView">
   <div class="jobs-head">
     <div>
-      <div class="cal-title">수집된 최신 공고</div>
+      <div class="cal-title">채용 공고</div>
       <div class="upd" id="jobsUpdated"></div>
     </div>
     <div class="jctrl">
@@ -445,23 +450,19 @@ footer{max-width:1180px; margin:0 auto 40px; padding:0 22px; font-size:12.5px; c
 </div>
 
 <footer>
-  💡 <b>사용 팁</b> — 이 파일을 바탕화면 등에 저장해두고 브라우저로 열면 모든 입력이 자동 저장됩니다.
-  공식 채용 링크가 바뀌었으면 카드의 "링크 수정"으로 고칠 수 있고, 포털 링크는 클릭할 때마다 항상 최신 공고를 보여줍니다.
-  다른 PC로 옮길 땐 "백업 저장 → 불러오기"를 사용하세요 (달력 일정도 함께 백업돼요).
-  <br>🏷 <b>뱃지 안내</b> — <span style="color:var(--warn); font-weight:700">공고 N건</span>: 자동수집된 진행 중 공고 수 ·
-  <span style="color:var(--amber); font-weight:700">자사채용 위주</span>: 사람인 자동수집에 누락될 수 있는 기업 (공식 채용 링크 병행 확인) ·
-  <span style="color:var(--warn); font-weight:700">⚠ 수집 0건</span>: 이번 수집에 안 잡힌 자사채용 위주 기업 — 공고가 없다는 뜻이 아니니 꼭 공식페이지를 확인하세요.
+  공고는 매일 아침 사람인에서 자동으로 업데이트됩니다. 회사 채용 페이지가 바뀌면 카드의 링크 수정에서 바꿀 수 있어요.
+  다른 기기에서 쓰려면 로그인하면 됩니다.
 </footer>
 
 <div id="overlay"><div class="modal" id="modalBox"></div></div>
 <div class="savebar" id="savebar">저장됨 ✓</div>
 
-<div id="bootMsg" style="max-width:600px; margin:60px auto; padding:0 20px; text-align:center; color:var(--sub); line-height:1.8;">☁ 연결 중...</div>
+<div id="bootMsg" style="max-width:600px; margin:60px auto; padding:0 20px; text-align:center; color:var(--sub); line-height:1.8;">불러오는 중...</div>
 
 <div id="loginGate" style="display:none; position:fixed; inset:0; background:rgba(15,30,61,.55); z-index:70; align-items:center; justify-content:center; padding:20px;">
   <div style="background:#fff; border-radius:16px; padding:26px; max-width:380px; width:100%;">
-    <div style="font-size:18px; font-weight:800; margin-bottom:4px;">☁ 내 트래커 로그인</div>
-    <div id="loginHint" style="font-size:12.5px; color:var(--sub); margin-bottom:14px; line-height:1.6;">이메일로 6자리 인증코드를 받아 로그인하면, 어떤 기기에서든 같은 데이터가 이어져요. 비밀번호는 없어요.</div>
+    <div style="font-size:18px; font-weight:800; margin-bottom:4px;">로그인</div>
+    <div id="loginHint" style="font-size:12.5px; color:var(--sub); margin-bottom:14px; line-height:1.6;">이메일로 로그인하면 어느 기기에서나 같은 데이터를 볼 수 있어요.</div>
     <div style="display:flex; flex-direction:column; gap:9px;">
       <input type="email" id="loginEmail" placeholder="이메일 주소" style="padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; outline:none;">
       <button class="btn primary" id="otpSendBtn" style="padding:11px;">인증코드 받기</button>
@@ -568,7 +569,7 @@ const store = {
       if(!sbClient||!UID){ flash("로그인 필요"); return; }
       try{
         const {error}=await sbClient.from("tracker").upsert({user_id:UID, data:DATA, updated_at:new Date().toISOString()});
-        flash(error?"저장 실패 — 새로고침 후 재시도":"☁ 저장됨 ✓");
+        flash(error?"저장 실패 — 새로고침 후 다시 시도해주세요":"저장됨");
         if(error) console.error(error);
       }catch(e){ flash("저장 실패 — 네트워크 확인"); }
     },700);
@@ -698,8 +699,8 @@ function renderBoard(){
       +(jobsFor(n).length?'<span class="jobbadge" title="최신 공고 탭에서 확인">공고 '+jobsFor(n).length+'건</span>':"")
       +(OWN_PORTAL.has(n)?(
           (window.JOBS && Array.isArray(window.JOBS.items) && !jobsFor(n).length)
-          ?'<span class="ownbadge alert" title="이번 자동수집에서 0건이었어요. 이 기업은 자사/그룹 채용사이트 위주라 사람인에 공고가 안 올라올 수 있으니 공식 채용 링크를 직접 확인하세요.">⚠ 수집 0건 · 공식페이지 확인</span>'
-          :'<span class="ownbadge" title="자사/그룹/글로벌 채용사이트 위주 기업이라 자동수집에 누락될 수 있어요. 공식 채용 링크 병행 확인을 권장해요.">자사채용 위주</span>'
+          ?'<span class="ownbadge alert" title="이번 자동수집에서 0건이었어요. 이 기업은 자사/그룹 채용사이트 위주라 사람인에 공고가 안 올라올 수 있으니 공식 채용 링크를 직접 확인하세요.">공식 페이지 확인</span>'
+          :'<span class="ownbadge" title="자사/그룹/글로벌 채용사이트 위주 기업이라 자동수집에 누락될 수 있어요. 공식 채용 링크 병행 확인을 권장해요.">자사 채용</span>'
         ):"")+'</div>'
       +'<div class="c-ctrl"><select class="statusSel">'+STATUSES.map(s=>'<option '+(s===r.status?"selected":"")+'>'+s+'</option>').join("")+'</select>'
       +'<input type="date" class="dl" value="'+r.deadline+'" title="지원 마감일">'+ddayBadge(dd)+'</div>'
@@ -956,7 +957,7 @@ document.getElementById("calJobFilter").addEventListener("click",e=>{
 document.getElementById("calDoneFilter").addEventListener("click",e=>{
   calDoneOnly=!calDoneOnly;
   e.target.classList.toggle("on-teal", calDoneOnly);
-  e.target.textContent = calDoneOnly ? "☑ 신청한 것만 (해제)" : "☑ 신청한 것만";
+  e.target.textContent = calDoneOnly ? "신청한 것만 (해제)" : "신청한 것만";
   renderCal();
 });
 document.getElementById("calPrev").addEventListener("click",()=>{ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); });
@@ -1051,7 +1052,7 @@ function renderJobs(){
     ? (b.posted||"").localeCompare(a.posted||"")
     : (a.expiration||"9999").localeCompare(b.expiration||"9999"));
   upd.textContent = "마지막 업데이트: "+window.JOBS.generatedAt+" · 총 "+window.JOBS.items.length+"건 · 출처: 사람인 채용정보 API";
-  if(!items.length){ wrap.innerHTML = '<div class="empty">조건에 맞는 공고가 없어요.</div>'; return; }
+  if(!items.length){ wrap.innerHTML = '<div class="empty">해당하는 공고가 없습니다.</div>'; return; }
   wrap.innerHTML = items.map((it,i)=>{
     const dd = it.expiration ? dday(it.expiration) : null;
     const SZL={"대":"대기업","외국":"외국계","중견":"중견","중소":"중소","":"기타"};
@@ -1130,7 +1131,7 @@ function renderAct(){
     +ACT_HOT.map((it,i)=>'<div class="act-card" style="border-color:var(--amber)">'
       +'<h4>'+it.name+'</h4><div class="why">'+it.why+'</div>'
       +'<div class="act-btns"><a href="'+it.url+'" target="_blank" rel="noopener">사이트 열기 ↗</a>'
-      +'<button class="btn small" data-hotadd="'+i+'">📌 달력에 바로 등록</button></div>'
+      +'<button class="btn small" data-hotadd="'+i+'">달력에 등록</button></div>'
       +'</div>').join("")
     +'</div></div>'
     +ACT_GROUPS.map((g,gi)=>'<div class="act-group"><h2>'+g.title+'</h2><div class="gdesc">'+g.desc+'</div><div class="act-grid">'
@@ -1141,7 +1142,7 @@ function renderAct(){
       +'<button class="btn small" data-actadd="'+gi+'-'+ii+'">모집일정 달력에 등록</button></div>'
       +'</div>').join("")
     +'</div></div>').join("")
-    +'<div class="res-note" style="background:var(--card); border:1.5px dashed var(--line); border-radius:12px; padding:14px 16px;">💡 활용 순서: 사이트에서 모집공고 확인 → "모집일정 달력에 등록" 클릭 → 달력 폼에 이름·유형이 자동 입력되니 접수 마감일만 넣으면 D-day 관리 시작. 프로그램 모집은 수시로 열리니 사이트 확인을 주 1회 루틴으로 잡는 걸 추천해요.</div>';
+    +'<div class="res-note" style="background:var(--card); border:1.5px dashed var(--line); border-radius:12px; padding:14px 16px;">공정실습·교육 프로그램은 수시로 모집합니다. 관심 있는 프로그램은 달력에 등록해 마감일을 관리하세요.</div>';
   box.addEventListener("click",e=>{
     const h = e.target.closest("[data-hotadd]");
     if(h){
