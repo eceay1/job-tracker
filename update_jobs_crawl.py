@@ -53,15 +53,25 @@ SIZE_MAP = {
  "디엔에프":"중소","미코":"중소","엠케이전자":"중소","대주전자":"중소","나노신소재":"중소","선익":"중소","참엔지니어링":"중소",
 }
 def size_hit(c):
-    low=(c or "").lower().replace(" ","").replace("(주)","").replace("㈜","")
+    low=(c or "").lower().replace(" ","").replace("(주)","").replace("㈜","").replace("(유)","")
     for k,sz in SIZE_MAP.items():
-        if k.replace(" ","") in low: return sz
+        kk=k.replace(" ","").lower()
+        if len(kk)<=3:
+            if low==kk or low.startswith(kk) or low.startswith(kk+"("): return sz
+        else:
+            if kk in low: return sz
     return ""
 
 def fav_hit(c):
-    low=(c or "").lower().replace(" ","").replace("(주)","").replace("㈜","")
+    low=(c or "").lower().replace(" ","").replace("(주)","").replace("㈜","").replace("(유)","")
+    # 짧은 키워드(3글자 이하)는 오탐 방지 위해 더 엄격하게 매칭
     for k,cat in FAV.items():
-        if k.replace(" ","") in low: return cat
+        kk=k.replace(" ","").lower()
+        if len(kk)<=3:
+            # 회사명이 이 키워드로 시작하거나, 정확히 일치, 또는 "키워드+"으로 시작할 때만
+            if low==kk or low.startswith(kk) or low.startswith(kk+"("): return cat
+        else:
+            if kk in low: return cat
     return None
 def guess_cat(c,t):
     x=(c+" "+t).lower()
@@ -71,6 +81,32 @@ def guess_cat(c,t):
     if any(w in x for w in ["소재","화학","전구체","웨이퍼","포토","레지스트"]): return 3
     if any(w in x for w in ["장비","설비","챔버","증착","식각","etch","cvd"]): return 1
     return 0
+
+# 반도체·이차전지 관련 공고인지 검증 (확실한 것만 담기)
+RELEVANT_KW = [
+ "반도체","웨이퍼","포토","식각","etch","증착","cvd","pvd","ald","cmp","이온주입","포토레지스트",
+ "패키징","본딩","범핑","다이싱","프로브","웨이퍼테스트","후공정","전공정",
+ "소자","공정개발","공정기술","수율","불량분석","클린룸","fab","팹",
+ "이차전지","2차전지","배터리","리튬","양극재","음극재","전해질","분리막","전극","셀","모듈","팩",
+ "전구체","슬러리","도전재","박막","반도체장비","반도체소재","반도체공정",
+ "디스플레이","oled","lcd","tft","패널",
+ "플라즈마","챔버","진공","박막공정","화학소재","전자재료","특수가스",
+ "semiconductor","battery","wafer","display","materials","process engineer","equipment",
+]
+# 명백히 무관한 것 제외 (오탐 방지)
+EXCLUDE_KW = [
+ "영업","마케팅","회계","총무","인사관리","경리","비서","콜센터","텔레마케팅",
+ "요양","간병","조리","주방","배달","운전","택배","경비","청소","미화",
+ "학원강사","과외","보육","유치원","카페","서빙","판매원","매장관리",
+ "부동산","보험설계","대출","펀드","증권영업",
+]
+def is_relevant(company, title, sector):
+    txt=(company+" "+title+" "+sector).lower()
+    # 제외 키워드가 제목에 있으면 버림 (단, 관련 키워드도 함께 있으면 유지)
+    has_rel=any(k.lower() in txt for k in RELEVANT_KW)
+    has_exc=any(k in title for k in EXCLUDE_KW)
+    if has_exc and not has_rel: return False
+    return has_rel
 
 KEYWORDS = ["반도체 공정","반도체 장비","반도체 소자","식각","증착","이차전지","배터리 소재","반도체 소재"]
 
@@ -175,10 +211,11 @@ def main():
             n=0
             for r in rows:
                 cat=fav_hit(r["company"]); is_fav=cat is not None
-                # 관심기업만 담기 (원하면 전체로 확장 가능)
+                # 관심기업이 아니면, 반도체·이차전지 관련 공고만 담기 (확실한 것만)
                 if cat is None:
+                    if not is_relevant(r["company"], r["title"], r["sector"]):
+                        continue  # 무관한 공고는 버림
                     cat=guess_cat(r["company"],r["title"]+r["sector"])
-                    # 관심기업 아니어도 반도체/전지 키워드 맞으면 포함
                 key=r["url"] or (r["company"]+r["title"])
                 if key in got: continue
                 dl=norm_deadline(r["deadline_raw"])
