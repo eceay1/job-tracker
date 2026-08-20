@@ -40,6 +40,7 @@ FAV = {
 }
 # 기업 형태 매칭 (대/중견/중소/외국)
 SIZE_MAP = {
+ "하나마이크론":"중견","하나머티리얼즈":"중견","덕산테코피아":"중소","덕산하이메탈":"중소","덕산네오룩스":"중견",
  "삼성전자":"대","하이닉스":"대","sk하이닉스":"대","삼성전기":"대","삼성디스플레이":"대","삼성sdi":"대",
  "엘지":"대","lg":"대","포스코":"대","롯데":"대","두산":"대","한화":"대","현대":"대","kcc":"대","sk온":"대","sk실트론":"대","skc":"대",
  "마이크론":"외국","micron":"외국","온세미":"외국","onsemi":"외국","어플라이드":"외국","applied":"외국",
@@ -110,14 +111,22 @@ def is_relevant(company, title, sector):
 
 KEYWORDS = ["반도체 공정","반도체 장비","반도체 소자","식각","증착","이차전지","배터리 소재","반도체 소재"]
 
-def fetch(keyword, page=1):
+def fetch(keyword, page=1, retries=3):
     kw=urllib.parse.quote(keyword)
     url=(f"https://www.saramin.co.kr/zf_user/search/recruit?"
          f"searchType=search&searchword={kw}&recruitPage={page}"
          f"&recruitSort=relation&recruitPageCount=40")
-    req=urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=25, context=ctx) as r:
-        return r.read().decode("utf-8","replace")
+    last=None
+    for attempt in range(retries):
+        try:
+            req=urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=40, context=ctx) as r:
+                return r.read().decode("utf-8","replace")
+        except Exception as e:
+            last=e
+            if attempt < retries-1:
+                time.sleep(3*(attempt+1))  # 3초, 6초 간격으로 재시도
+    raise last
 
 def fetch_detail_dates(url):
     """공고 상세페이지에서 접수 시작일/마감일 추출 (관심기업만 호출)"""
